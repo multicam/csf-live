@@ -21,6 +21,5 @@
       "@csf-live/shared/constants": ["../shared/constants.ts"]
     }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"]
 }
