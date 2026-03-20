@@ -2,7 +2,7 @@
 
 **Version**: 1.0  
 **Date**: 2026-03-20  
-**Authors**: Anthony + Ben  
+**Authors**: JM (me) + Ben  
 **Status**: Pre-development — Ready for Claude Code itemization  
 **Purpose**: This document is the single source of truth for The Forge. It is written to be consumed by Claude Code for work order generation, architecture planning, and phased implementation.
 
@@ -51,7 +51,7 @@ The gap between having ideas and executing on them. Specifically:
 
 - Ideas emerge during Friday sessions, on the bus, in Claude Code sessions, from Twitter bookmarks, from web research — and they scatter across tools with no shared persistent home.
 - Claude Code and AI models amplify capability but also create information overload. There is no system to receive, organize, rank, and consolidate the flood.
-- Two collaborators (Anthony and Ben) need a shared brain — a place where discussions, visual thinking, and AI-generated output converge and persist.
+- Two collaborators (JM and Ben) need a shared brain — a place where discussions, visual thinking, and AI-generated output converge and persist.
 
 ### What The Forge Is NOT
 
@@ -73,11 +73,11 @@ The gap between having ideas and executing on them. Specifically:
 
 ### Current Scope
 
-Two platform owners: Anthony and Ben. They see everything on the platform — all projects, all content, all activity.
+Two platform owners: JM and Ben. They see everything on the platform — all projects, all content, all activity.
 
 ### Access Tiers
 
-**Tier 1 — Platform Owners (Anthony, Ben)**
+**Tier 1 — Platform Owners (JM, Ben)**
 - Full visibility across all projects, feed, settings
 - Can see all users on the platform
 - Can create projects, invite third parties
@@ -862,7 +862,7 @@ Not all projects will enter the pipeline. Some are just idea spaces, research co
 These are NOT in scope for initial phases but the architecture should not preclude them:
 
 ### Diderot Integration
-- Anthony uses Diderot for content curation and quality ranking from web sources
+- JM uses Diderot for content curation and quality ranking from web sources
 - Future: Diderot output feeds into The Forge as curated content items
 - Architecture: API endpoint that accepts Diderot-formatted content
 
