@@ -35,6 +35,7 @@ CSF Live is a private, collaborative AI workspace where a small team captures id
 | [data-model.md](data-model.md) | Database schema, tables, indexes, full-text search |
 | [claude-integration.md](claude-integration.md) | Claude in production (API, CLI, SDK), development integration, context assembly, streaming, agents |
 | [sdd.md](sdd.md) | Scenario-Driven Development methodology, Gherkin formalism, devtools-mcp + react-grab workflow |
+| [secrets.md](secrets.md) | API keys and secrets required per tier — what, where, when |
 
 ### Planning
 
