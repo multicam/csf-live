@@ -105,7 +105,7 @@ The `mockApi` module reads from and writes to this store. Phase 2 backend integr
 | **Content items** | Render all 9 types, content cards, metadata display | [Content](content.md) |
 | **Content fluidity** | Move to project, copy, drag-and-drop (desktop) | [Content](content.md#content-fluidity) |
 | **Timeline mode (list panel)** | Chronological list, filters, infinite scroll | [Views](views.md) |
-| **Spatial canvas (tldraw)** | Canvas as permanent background, content items as shapes in project mode, draw, annotate | [Canvas](canvas.md), [Layout](layout.md) |
+| **Drawing in Detail column** | tldraw editor for `drawing` content items in column 3, create/edit/version drawings | [Canvas](canvas.md), [Layout](layout.md) |
 | **Categorized mode (list panel)** | Group by type, collapsible sections, counts | [Views](views.md) |
 | **Search UI** | Search bar, filter chips, result list (mock results) | [Search](search.md) |
 | **Document viewer/editor** | Markdown rendering, TipTap editing, version history | [Content](content.md#documents) |

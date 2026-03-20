@@ -7,29 +7,27 @@
 
 ## Core Principle
 
-The same underlying data, viewed through different lenses. The user switches the List Panel mode without affecting the data. The canvas is always present — it is not a view you switch to.
+The same underlying data, viewed through different lenses. The user switches the Feed column (column 2) mode without affecting the data.
 
-### The Canvas Is Not a View
+### The Canvas Is a Separate Mode
 
-The tldraw canvas is the permanent background of the entire application. It is always present and always interactive. See [Layout](layout.md) for how the canvas, panels, and controls are structured.
+The tldraw canvas lives at `/` as a full-screen scratchpad. It is **not** a background behind the feed columns. The canvas and the feed (`/feed/*`) are two separate top-level modes of the app. See [Layout](layout.md).
 
-- **Feed mode**: the canvas is a general shared whiteboard
-- **Project mode**: the canvas becomes that project's spatial view, with content items as custom card shapes
+Drawing content items (type: `drawing`) open as embedded tldraw editors in the Detail column (column 3) within the feed layout.
 
-### List Panel Modes
+### Feed Column Modes
 
-"Views" in the traditional sense are now **modes of the List Panel** (right side). They control how content items are organized and displayed in the panel.
+"Views" are **modes of the Feed column** (column 2 in the `/feed/*` layout). They control how content items are organized and displayed.
 
-### View Availability
+### Mode Availability
 
-| View / Mode | Platform level | Project level | Notes |
-|-------------|---------------|--------------|-------|
-| **Spatial / Canvas** | Always present | Always present | Permanent background — not a switchable view. See [Layout](layout.md) and [Canvas](canvas.md). |
-| **Timeline** | Yes | Yes | Default List Panel mode — chronological |
-| **Categorized** | Yes | Yes | Alternative List Panel mode — grouped by type |
-| **Search** | Global (not scoped to a level) | — | List Panel mode when searching |
+| Mode | Global (`/feed`) | Project (`/feed/:slug`) | Notes |
+|------|-----------------|------------------------|-------|
+| **Timeline** | Yes | Yes | Default — chronological list |
+| **Categorized** | Yes | Yes | Grouped by content type |
+| **Search** | Global | Scoped to project | Results with relevance ranking |
 
-> **The Feed is not a view.** The General Feed is a distinct top-level context with its own semantics (chat-style, messages + content items interleaved). It is not the same as the Timeline mode. See [Feed](feed.md).
+> **The General Feed is not a "mode."** At `/feed`, the Feed column shows the global feed (messages + unassigned content items interleaved chronologically). This is the default state, not a mode you switch to. Modes (categorized, search) alter how items are organized within that feed. See [Feed](feed.md).
 
 ### Default Sort Orders
 
@@ -40,7 +38,7 @@ The tldraw canvas is the permanent background of the entire application. It is a
 
 ## Mode 1: Timeline (default)
 
-- Chronological list of all content items in the List Panel
+- Chronological list of all content items in the Feed column
 - Newest at bottom (chat-style) or newest at top (feed-style) — user preference
 - Each item shows: author avatar, timestamp, content type icon, content preview, section label (if in a project)
 - Infinite scroll with lazy loading
@@ -48,7 +46,7 @@ The tldraw canvas is the permanent background of the entire application. It is a
 
 ## Mode 2: Categorized
 
-- Content grouped by type (Ideas, Drawings, Documents, Research, Links, etc.) in the List Panel
+- Content grouped by type (Ideas, Drawings, Documents, Research, Links, etc.) in the Feed column
 - Each category is a collapsible section
 - Within each category, items are listed chronologically
 - Counts shown per category
@@ -56,7 +54,7 @@ The tldraw canvas is the permanent background of the entire application. It is a
 
 ## Mode 3: Search
 
-- List Panel shows search results when a search is active
+- Feed column shows search results when a search is active
 - Results appear as a filtered list with relevance ranking
 - Search across: titles, body text, tags, metadata, transcriptions
 - Natural language queries supported when Claude is invoked (see [Search](search.md))
@@ -64,10 +62,9 @@ The tldraw canvas is the permanent background of the entire application. It is a
 
 ---
 
-## List Panel Mode Switching
+## Mode Switching
 
-- Mode switcher (icon tabs or dropdown) available within the List Panel header
+- Mode switcher (icon tabs or dropdown) available in the Feed column header
 - Mode preference is remembered per context (e.g., "I always use timeline in Project Alpha, categorized in Project Beta")
 - **Data**: switching modes is instant — no refetch. The underlying data is already loaded.
-- **Visual transition**: brief crossfade, 200–300ms. Not a hard cut, not a full panel reload.
-- Switching modes does not affect the canvas — the canvas state is independent of the list mode.
+- **Visual transition**: brief crossfade, 200–300ms. Not a hard cut, not a full column reload.

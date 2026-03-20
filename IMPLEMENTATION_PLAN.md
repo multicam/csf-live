@@ -23,6 +23,24 @@
 
 No code exists. `packages/` directory does not exist. `specs/scenarios/` does not exist. TIER=1 confirmed.
 
+### Iteration 1 Gap Analysis (2026-03-21)
+
+Cross-referencing specs against plan found these corrections:
+
+**Task 1.3 gaps (shared types):**
+- `ProjectMember` type missing entirely — `data-model.md` defines `project_members` table (`projectId`, `userId`, `role`, `invitedBy`, `joinedAt`). Required for mock data (Ben is a member of CSF Live project).
+- `ContentItem.deletedAt: Date | null` missing — data model uses soft delete pattern.
+- `ContentItem.source` enum not specified: `'human' | 'claude' | 'agent' | 'import'`
+- `ContentItem.status` enum not explicit: `'active' | 'archived' | 'merged'`
+- `Message.source` enum not specified: `'web' | 'mobile' | 'claude-code' | 'agent'`
+- Convention: TypeScript types use camelCase (`createdAt`, `authorId`, etc.) — FK fields are `userId`, not `user` or `user_id`
+
+**Scenario coverage gaps:**
+- `content/document-editing.feature` is completely missing — TipTap editing is a major Tier 1 feature (Task 3.11) with zero scenario coverage.
+- No `layout/keyboard-shortcuts.feature` — keyboard shortcuts (Cmd+K, Cmd+\, Escape) are scattered across tasks with no scenario validation.
+
+**Sort order clarification confirmed:** General feed (`/feed`) is always newest-at-bottom (chat-style, fixed). Sort toggle applies only to Timeline mode within project feeds. `feed.md` is authoritative; `views.md` is imprecise. Plan already reflects this correctly.
+
 ### Tier 2+ Deferred Items
 
 Items explicitly excluded from Tier 1 (not planned here):
@@ -123,7 +141,10 @@ Create `packages/shared/types.ts` with complete interfaces matching the data mod
 - `User` — id, name, email, role (`'owner' | 'collaborator'`), avatarUrl, createdAt, updatedAt
 - `Project` — id, title, slug, description, status (`'active' | 'paused' | 'archived' | 'completed'`), createdBy, createdAt, updatedAt
 - `Section` — id, projectId, title, description, order, createdBy, createdAt, updatedAt
-- `ContentItem` — id, type, title, body, mediaUrl, mediaType, metadata (includes `document_type` field for `type === 'document'`), source, sourceDetail, projectId, sectionId, parentId, authorId, status, version, createdAt, updatedAt
+- `ProjectMember` — projectId, userId, role (`'owner' | 'collaborator'`), invitedBy, joinedAt
+- `ContentItem` — id, type, title, body, mediaUrl, mediaType, metadata (includes `document_type` field for `type === 'document'`), source, sourceDetail, projectId, sectionId, parentId, authorId, status, version, createdAt, updatedAt, deletedAt (nullable)
+  - `source`: `'human' | 'claude' | 'agent' | 'import'`
+  - `status`: `'active' | 'archived' | 'merged'`
 - `ContentVersion` — id, contentItemId, versionNumber, body, mediaData, authorId, changeSummary, createdAt
   - **Field names are `body` + `mediaData`** (NOT `content`)
 - `ContentType` — `'idea' | 'drawing' | 'sketch' | 'document' | 'link' | 'voice' | 'photo' | 'research' | 'file'`
@@ -131,7 +152,7 @@ Create `packages/shared/types.ts` with complete interfaces matching the data mod
 - `DocumentType` — `'note' | 'prd' | 'blueprint' | 'work-orders' | 'research-summary' | 'meeting-notes' | 'freeform'` (stored in `metadata.document_type`)
 - `Tag` — id, name
 - `Discussion` — id, contextType (`'feed' | 'project' | 'section'`), contextId (nullable), createdAt
-- `Message` — id, discussionId, authorId, content, contentType (`'text' | 'voice' | 'image' | 'file' | 'claude-response'`), mediaUrl, metadata, source, createdAt
+- `Message` — id, discussionId, authorId, content, contentType (`'text' | 'voice' | 'image' | 'file' | 'claude-response'`), mediaUrl, metadata, source (`'web' | 'mobile' | 'claude-code' | 'agent'`), createdAt
 - `Notification` — id, userId, type, title, body, referenceType, referenceId, read, createdAt
 - `Presence` — userId, status (`'online' | 'offline'`), currentLocation, lastHeartbeat
 - `FeedItem` — discriminated union: `(Message & { _sourceTable: 'message' }) | (ContentItem & { _sourceTable: 'content_item' })`
@@ -774,6 +795,14 @@ All `.feature` files in `specs/scenarios/`. Each includes a `# Status: 0/N scena
 3. "Ben is in this project" on CSF Live project dashboard
 4. Ben's indicator absent on other projects
 5. No cursor tracking or real-time updates in Tier 1 (static)
+
+### `content/document-editing.feature`
+1. Clicking a document item opens TipTap editor in Detail column
+2. Toolbar buttons (Bold, Italic, H1/H2/H3, Code, Blockquote) apply formatting
+3. Editing content triggers auto-save after 2s inactivity
+4. Auto-save creates a new version in version history
+5. `document_type` badge shown in editor header (e.g., "PRD", "Note")
+6. Switching to a different item discards unsaved draft (no cross-item leakage)
 
 ### `content/version-history.feature`
 1. Version history panel lists all versions
