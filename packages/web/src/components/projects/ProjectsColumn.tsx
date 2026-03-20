@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react'
 import { useProjects } from '@/hooks/useProjects'
 import { usePresence } from '@/hooks/usePresence'
 import { useMockStore } from '@/mocks/store'
+import { useMoveContentItem } from '@/hooks/useContentItem'
 import { ProjectCard } from './ProjectCard'
 import { CreateProjectDialog } from './CreateProjectDialog'
 import { cn } from '@/lib/utils'
@@ -16,6 +17,8 @@ export function ProjectsColumn() {
   const { users } = useMockStore()
   const [sortMode, setSortMode] = useState<SortMode>('recent')
   const [showCreateDialog, setShowCreateDialog] = useState(false)
+  const [feedDragOver, setFeedDragOver] = useState(false)
+  const moveItem = useMoveContentItem()
 
   const onlineUsers = presenceList
     .filter(p => p.status === 'online')
@@ -27,6 +30,24 @@ export function ProjectsColumn() {
     if (sortMode === 'status') return a.status.localeCompare(b.status)
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   })
+
+  function handleFeedDragOver(e: React.DragEvent) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setFeedDragOver(true)
+  }
+
+  function handleFeedDragLeave() {
+    setFeedDragOver(false)
+  }
+
+  function handleFeedDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setFeedDragOver(false)
+    const itemId = e.dataTransfer.getData('text/plain')
+    if (!itemId) return
+    moveItem.mutate({ itemId, projectId: null })
+  }
 
   return (
     <div className="flex h-full flex-col pt-12">
@@ -47,14 +68,18 @@ export function ProjectsColumn() {
         </select>
       </div>
 
-      {/* General Feed link */}
+      {/* General Feed link — also a drop target */}
       <Link
         to="/feed"
+        onDragOver={handleFeedDragOver}
+        onDragLeave={handleFeedDragLeave}
+        onDrop={handleFeedDrop}
         className={cn(
           'mx-2 mb-1 flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors',
           'text-warm-700 hover:bg-warm-200 hover:text-warm-900',
           'dark:text-warm-300 dark:hover:bg-warm-800 dark:hover:text-warm-100',
-          '[&.active]:bg-warm-200 [&.active]:text-warm-900 dark:[&.active]:bg-warm-800 dark:[&.active]:text-warm-100'
+          '[&.active]:bg-warm-200 [&.active]:text-warm-900 dark:[&.active]:bg-warm-800 dark:[&.active]:text-warm-100',
+          feedDragOver && 'ring-2 ring-warm-500'
         )}
       >
         <span className="h-2 w-2 rounded-full bg-blue-400 flex-shrink-0" />

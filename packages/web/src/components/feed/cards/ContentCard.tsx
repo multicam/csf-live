@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ContentItem } from '@csf-live/shared'
 import { CONTENT_TYPE_LABELS } from '@csf-live/shared/constants'
 import {
@@ -11,9 +12,12 @@ import {
   File,
   Image,
 } from 'lucide-react'
+import * as ContextMenu from '@radix-ui/react-context-menu'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from '@/lib/time'
 import { useMockStore } from '@/mocks/store'
+import { useMoveContentItem } from '@/hooks/useContentItem'
+import { MoveItemDialog } from '../MoveItemDialog'
 
 const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   idea: Lightbulb,
@@ -33,6 +37,8 @@ interface ContentCardProps {
   isSelected?: boolean
 }
 
+type DialogMode = 'move' | 'copy'
+
 export function ContentCard({ item, onClick, isSelected }: ContentCardProps) {
   const { users } = useMockStore()
   const author = users.find(u => u.id === item.authorId)
@@ -48,9 +54,24 @@ export function ContentCard({ item, onClick, isSelected }: ContentCardProps) {
   const linkTitle = item.metadata?.title as string | undefined
   const linkDomain = item.metadata?.domain as string | undefined
 
-  return (
+  const [isDragging, setIsDragging] = useState(false)
+  const [dialogMode, setDialogMode] = useState<DialogMode | null>(null)
+  const moveItem = useMoveContentItem()
+
+  function handleUnassign() {
+    moveItem.mutate({ itemId: item.id, projectId: null, sectionId: null })
+  }
+
+  const cardContent = (
     <div
+      draggable
       onClick={onClick}
+      onDragStart={e => {
+        e.dataTransfer.setData('text/plain', item.id)
+        e.dataTransfer.effectAllowed = 'move'
+        setIsDragging(true)
+      }}
+      onDragEnd={() => setIsDragging(false)}
       className={cn(
         'rounded-lg border border-warm-200 bg-white p-3 transition-shadow dark:border-warm-700 dark:bg-warm-800',
         'animate-[fade-in_0.2s_ease-out]',
@@ -58,7 +79,8 @@ export function ContentCard({ item, onClick, isSelected }: ContentCardProps) {
         onClick ? 'cursor-pointer hover:shadow-md' : '',
         isSelected
           ? 'ring-2 ring-warm-900 dark:ring-warm-100 border-warm-900 dark:border-warm-100'
-          : ''
+          : '',
+        isDragging ? 'opacity-50' : ''
       )}
     >
       {/* Header */}
@@ -143,5 +165,73 @@ export function ContentCard({ item, onClick, isSelected }: ContentCardProps) {
         </div>
       )}
     </div>
+  )
+
+  return (
+    <>
+      <ContextMenu.Root>
+        <ContextMenu.Trigger asChild>
+          {cardContent}
+        </ContextMenu.Trigger>
+
+        <ContextMenu.Portal>
+          <ContextMenu.Content
+            className="z-50 min-w-44 rounded-lg border border-warm-200 bg-white p-1 shadow-lg dark:border-warm-700 dark:bg-warm-900"
+          >
+            <ContextMenu.Item
+              className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-warm-700 hover:bg-warm-100 hover:text-warm-900 dark:text-warm-300 dark:hover:bg-warm-800 dark:hover:text-warm-100 outline-none"
+              onSelect={() => setDialogMode('move')}
+            >
+              Move to…
+            </ContextMenu.Item>
+
+            <ContextMenu.Item
+              className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-warm-700 hover:bg-warm-100 hover:text-warm-900 dark:text-warm-300 dark:hover:bg-warm-800 dark:hover:text-warm-100 outline-none"
+              onSelect={() => setDialogMode('copy')}
+            >
+              Copy to…
+            </ContextMenu.Item>
+
+            {item.projectId && (
+              <>
+                <ContextMenu.Separator className="my-1 h-px bg-warm-200 dark:bg-warm-700" />
+                <ContextMenu.Item
+                  className="flex cursor-pointer items-center rounded-md px-3 py-2 text-sm text-warm-700 hover:bg-warm-100 hover:text-warm-900 dark:text-warm-300 dark:hover:bg-warm-800 dark:hover:text-warm-100 outline-none"
+                  onSelect={handleUnassign}
+                >
+                  Unassign
+                </ContextMenu.Item>
+              </>
+            )}
+
+            <ContextMenu.Separator className="my-1 h-px bg-warm-200 dark:bg-warm-700" />
+
+            <ContextMenu.Item
+              disabled
+              className="flex cursor-not-allowed items-center rounded-md px-3 py-2 text-sm text-warm-400 dark:text-warm-600 outline-none opacity-50"
+              title="Coming in Phase 2"
+            >
+              Split
+            </ContextMenu.Item>
+
+            <ContextMenu.Item
+              disabled
+              className="flex cursor-not-allowed items-center rounded-md px-3 py-2 text-sm text-warm-400 dark:text-warm-600 outline-none opacity-50"
+              title="Coming in Phase 2"
+            >
+              Merge
+            </ContextMenu.Item>
+          </ContextMenu.Content>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
+
+      {dialogMode && (
+        <MoveItemDialog
+          itemId={item.id}
+          mode={dialogMode}
+          onClose={() => setDialogMode(null)}
+        />
+      )}
+    </>
   )
 }

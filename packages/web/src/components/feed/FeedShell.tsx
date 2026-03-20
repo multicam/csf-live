@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { Outlet } from '@tanstack/react-router'
 import { AppMenu } from '@/components/shared/AppMenu'
+import { NotificationPanel } from '@/components/shared/NotificationPanel'
 import { ProjectsColumn } from '@/components/projects/ProjectsColumn'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { cn } from '@/lib/utils'
@@ -27,6 +28,7 @@ interface FeedShellProps {
 export function FeedShell({ children, col3 }: FeedShellProps) {
   const breakpoint = useBreakpoint()
   const [col1Width, setCol1Width] = useState(loadColWidth)
+  const [notificationOpen, setNotificationOpen] = useState(false)
   const [col1Collapsed, setCol1Collapsed] = useState(false)
   const dragging = useRef(false)
   const startX = useRef(0)
@@ -96,8 +98,13 @@ export function FeedShell({ children, col3 }: FeedShellProps) {
     <div className="flex h-screen overflow-hidden bg-warm-50 dark:bg-warm-950">
       {/* App Menu button — fixed top-left */}
       <div className="fixed top-2 left-2 z-40">
-        <AppMenu />
+        <AppMenu onNotificationsOpen={() => setNotificationOpen(true)} />
       </div>
+
+      <NotificationPanel
+        open={notificationOpen}
+        onClose={() => setNotificationOpen(false)}
+      />
 
       {/* Column 1 — Projects */}
       <div
