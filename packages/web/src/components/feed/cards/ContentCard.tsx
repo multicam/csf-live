@@ -29,9 +29,11 @@ const TYPE_ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
 
 interface ContentCardProps {
   item: ContentItem
+  onClick?: () => void
+  isSelected?: boolean
 }
 
-export function ContentCard({ item }: ContentCardProps) {
+export function ContentCard({ item, onClick, isSelected }: ContentCardProps) {
   const { users } = useMockStore()
   const author = users.find(u => u.id === item.authorId)
   const Icon = TYPE_ICONS[item.type] ?? FileText
@@ -48,10 +50,15 @@ export function ContentCard({ item }: ContentCardProps) {
 
   return (
     <div
+      onClick={onClick}
       className={cn(
-        'cursor-pointer rounded-lg border border-warm-200 bg-white p-3 transition-shadow hover:shadow-md dark:border-warm-700 dark:bg-warm-800',
+        'rounded-lg border border-warm-200 bg-white p-3 transition-shadow dark:border-warm-700 dark:bg-warm-800',
         'animate-[fade-in_0.2s_ease-out]',
-        '[container-type:inline-size]'
+        '[container-type:inline-size]',
+        onClick ? 'cursor-pointer hover:shadow-md' : '',
+        isSelected
+          ? 'ring-2 ring-warm-900 dark:ring-warm-100 border-warm-900 dark:border-warm-100'
+          : ''
       )}
     >
       {/* Header */}

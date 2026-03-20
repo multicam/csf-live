@@ -3,10 +3,16 @@ import { useFeedItems } from '@/hooks/useFeed'
 import { FeedItemRenderer } from './FeedItemRenderer'
 import { ComposeInput } from './ComposeInput'
 import { FEED_DISCUSSION_ID } from '@csf-live/shared/constants'
+import type { FeedItem } from '@csf-live/shared'
 
 type FeedMode = 'timeline' | 'categorized' | 'search'
 
-export function FeedColumn() {
+interface FeedColumnProps {
+  onSelectItem?: (item: FeedItem) => void
+  selectedItemId?: string | null
+}
+
+export function FeedColumn({ onSelectItem, selectedItemId }: FeedColumnProps) {
   const { data: feedItems = [], isLoading } = useFeedItems()
   const bottomRef = useRef<HTMLDivElement>(null)
   const [mode, setMode] = useState<FeedMode>('timeline')
@@ -50,7 +56,12 @@ export function FeedColumn() {
         ) : (
           <div className="px-3 py-4 space-y-2">
             {feedItems.map(item => (
-              <FeedItemRenderer key={item.id} item={item} />
+              <FeedItemRenderer
+                key={item.id}
+                item={item}
+                onSelect={onSelectItem}
+                isSelected={item.id === selectedItemId}
+              />
             ))}
             <div ref={bottomRef} />
           </div>

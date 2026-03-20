@@ -8,6 +8,8 @@ import { Bot } from 'lucide-react'
 interface MessageBubbleProps {
   message: Message
   isOwn: boolean
+  onClick?: () => void
+  isSelected?: boolean
 }
 
 function formatTime(date: Date): string {
@@ -17,13 +19,16 @@ function formatTime(date: Date): string {
   })
 }
 
-export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
+export function MessageBubble({ message, isOwn, onClick, isSelected }: MessageBubbleProps) {
   const { users } = useMockStore()
   const author = users.find(u => u.id === message.authorId)
   const isClaude = message.contentType === 'claude-response'
 
   return (
-    <div className={cn('flex gap-2', isOwn ? 'flex-row-reverse' : 'flex-row')}>
+    <div
+      className={cn('flex gap-2', isOwn ? 'flex-row-reverse' : 'flex-row')}
+      onClick={onClick}
+    >
       {/* Avatar — only for others */}
       {!isOwn && (
         <div
@@ -65,7 +70,9 @@ export function MessageBubble({ message, isOwn }: MessageBubbleProps) {
               ? 'bg-warm-900 text-warm-50 dark:bg-warm-100 dark:text-warm-900'
               : isClaude
               ? 'bg-violet-50 text-warm-900 border border-violet-200 dark:bg-violet-950 dark:text-warm-100 dark:border-violet-800'
-              : 'bg-white text-warm-900 border border-warm-200 dark:bg-warm-800 dark:text-warm-100 dark:border-warm-700'
+              : 'bg-white text-warm-900 border border-warm-200 dark:bg-warm-800 dark:text-warm-100 dark:border-warm-700',
+            isSelected ? 'ring-2 ring-warm-900 dark:ring-warm-100' : '',
+            onClick ? 'cursor-pointer' : ''
           )}
         >
           {isClaude ? (

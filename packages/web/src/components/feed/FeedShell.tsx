@@ -9,6 +9,8 @@ const MIN_COL1 = 180
 const MAX_COL1 = 400
 const MIN_COL2 = 300
 const DEFAULT_COL1 = 240
+const MIN_COL3 = 350
+const MAX_COL3 = 500
 
 function loadColWidth(): number {
   const stored = localStorage.getItem('col1Width')
@@ -17,7 +19,12 @@ function loadColWidth(): number {
     : DEFAULT_COL1
 }
 
-export function FeedShell() {
+interface FeedShellProps {
+  children?: React.ReactNode   // Column 2 content (when used directly, not via Outlet)
+  col3?: React.ReactNode | null // Column 3 content (optional)
+}
+
+export function FeedShell({ children, col3 }: FeedShellProps) {
   const breakpoint = useBreakpoint()
   const [col1Width, setCol1Width] = useState(loadColWidth)
   const [col1Collapsed, setCol1Collapsed] = useState(false)
@@ -75,14 +82,15 @@ export function FeedShell() {
     return (
       <div className="flex h-screen flex-col">
         <div className="flex-1 overflow-hidden">
-          <Outlet />
+          {children ?? <Outlet />}
         </div>
-        {/* Mobile tab bar placeholder — Task 3.19 */}
+        {/* Mobile tab bar placeholder */}
       </div>
     )
   }
 
   const showCol1 = !col1Collapsed
+  const showCol3 = col3 != null
 
   return (
     <div className="flex h-screen overflow-hidden bg-warm-50 dark:bg-warm-950">
@@ -118,12 +126,30 @@ export function FeedShell() {
         />
       )}
 
-      {/* Column 2 — Feed (main content from child routes) */}
+      {/* Column 2 — Feed (main content) */}
       <div
         className="flex min-w-0 flex-1 flex-col overflow-hidden"
         style={{ minWidth: MIN_COL2 }}
       >
-        <Outlet />
+        {children ?? <Outlet />}
+      </div>
+
+      {/* Column 3 — Detail panel */}
+      <div
+        className={cn(
+          'flex-shrink-0 overflow-hidden border-l border-warm-200 dark:border-warm-800 transition-[width] duration-200'
+        )}
+        style={{
+          width: showCol3 ? Math.min(MAX_COL3, Math.max(MIN_COL3, 380)) : 0,
+          minWidth: showCol3 ? MIN_COL3 : 0,
+          maxWidth: MAX_COL3,
+        }}
+      >
+        {showCol3 && (
+          <div className="h-full w-full overflow-hidden">
+            {col3}
+          </div>
+        )}
       </div>
     </div>
   )

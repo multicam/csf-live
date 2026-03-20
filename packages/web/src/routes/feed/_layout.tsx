@@ -1,8 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { FeedShell } from '@/components/feed/FeedShell'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 function FeedLayout() {
-  return <FeedShell />
+  return <Outlet />
 }
 
 export const Route = createFileRoute('/feed/_layout')({
