@@ -1,7 +1,8 @@
 import type { FeedItem, ContentItem, ContentVersion, Message, Project, Section, Notification, Presence, Tag } from '@csf-live/shared'
 import { FEED_DISCUSSION_ID } from '@csf-live/shared/constants'
 import { useMockStore } from './store'
-import { searchItems } from '../lib/search'
+import { searchItemsWithSnippets } from '../lib/search'
+import type { ContentItemWithSnippet } from '../lib/search'
 
 // Helper to get current store state
 function store() {
@@ -228,7 +229,7 @@ export interface SearchFilters {
   dateRange?: 'last7' | 'last30' | 'all'
 }
 
-export async function searchContentItems(query: string, filters?: SearchFilters): Promise<ContentItem[]> {
+export async function searchContentItems(query: string, filters?: SearchFilters): Promise<ContentItemWithSnippet[]> {
   if (!query.trim()) return []
-  return searchItems(query, filters)
+  return searchItemsWithSnippets(query, filters)
 }

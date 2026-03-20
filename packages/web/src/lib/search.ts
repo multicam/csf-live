@@ -3,6 +3,10 @@ import type { ContentItem } from '@csf-live/shared'
 import { useMockStore } from '../mocks/store'
 import type { SearchFilters } from '../mocks/api'
 
+export interface ContentItemWithSnippet extends ContentItem {
+  snippet: string
+}
+
 interface SearchDoc {
   id: string
   title: string
@@ -50,6 +54,29 @@ useMockStore.subscribe(() => {
   searchIndex = null
 })
 
+/**
+ * Extract a snippet around the first match of `query` in `text`.
+ * Returns up to ~160 chars centred on the match.
+ */
+export function extractSnippet(text: string, query: string): string {
+  if (!text || !query) return text?.slice(0, 160) ?? ''
+
+  const lowerText = text.toLowerCase()
+  const lowerQuery = query.toLowerCase().split(/\s+/)[0] ?? ''
+  const idx = lowerText.indexOf(lowerQuery)
+
+  if (idx === -1) {
+    return text.slice(0, 160) + (text.length > 160 ? '…' : '')
+  }
+
+  const radius = 60
+  const start = Math.max(0, idx - radius)
+  const end = Math.min(text.length, idx + lowerQuery.length + radius)
+  const prefix = start > 0 ? '…' : ''
+  const suffix = end < text.length ? '…' : ''
+  return prefix + text.slice(start, end) + suffix
+}
+
 export function searchItems(query: string, filters?: SearchFilters): ContentItem[] {
   const index = getIndex()
   const { contentItems } = useMockStore.getState()
@@ -85,4 +112,15 @@ export function searchItems(query: string, filters?: SearchFilters): ContentItem
   filtered.sort((a, b) => (rankMap.get(a.id) ?? 999) - (rankMap.get(b.id) ?? 999))
 
   return filtered
+}
+
+export function searchItemsWithSnippets(query: string, filters?: SearchFilters): ContentItemWithSnippet[] {
+  const results = searchItems(query, filters)
+  return results.map(item => {
+    const searchableText = item.body ?? item.title ?? ''
+    return {
+      ...item,
+      snippet: extractSnippet(searchableText, query),
+    }
+  })
 }
