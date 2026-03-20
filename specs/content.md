@@ -35,7 +35,6 @@ Every piece of content in CSF Live is a **Content Item** with a type:
 | Type | Description | Source |
 |------|-------------|--------|
 | `idea` | A raw thought, concept, or spark | Human input |
-| `message` | A discussion message | Human input |
 | `drawing` | A tldraw canvas document | Created in-app |
 | `sketch` | A photo of hand-drawn content | Uploaded photo |
 | `document` | A text document (markdown, PRD, notes) | Human or Claude |
@@ -44,6 +43,8 @@ Every piece of content in CSF Live is a **Content Item** with a type:
 | `photo` | An image (not a sketch — e.g. screenshot, reference) | Uploaded |
 | `research` | AI-generated research output | Claude |
 | `file` | Any other file attachment | Uploaded |
+
+> **Note:** Discussion messages (chat in feed, projects, sections) are stored in the `messages` table, not as content items. The `message` type does not exist in the content_items enum. See [Discussions](discussions.md) and [Data Model](data-model.md).
 
 ### Content Lifecycle
 

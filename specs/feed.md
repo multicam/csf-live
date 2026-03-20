@@ -24,15 +24,27 @@ The sidebar feel should be soft, warm, conversational. Not corporate. Think Mud/
 
 ### General Feed
 
-The feed is the default shared space. It behaves like a linear discussion between platform owners (like a Slack DM channel). Everything that doesn't belong to a project lives here.
+The feed is the default shared space. It behaves like a linear discussion between platform owners (like a Slack DM channel) mixed with captured content. Everything that doesn't belong to a project lives here.
 
-**Feed capabilities:**
-- Post text messages
-- Drop images, files, voice recordings, links
+### Feed Data Model
+
+The feed is a **unified stream** joining two tables:
+
+- **Messages** (`messages` table, `discussion_id` = feed discussion) — chat messages, Claude responses
+- **Content items** (`content_items` table, `project_id` IS NULL) — captured ideas, links, photos, voice recordings, files
+
+Both are interleaved chronologically by `created_at`. The feed view is a UNION query across both tables ordered by timestamp.
+
+**Moving content to a project:** Only content items can be moved (`UPDATE content_items SET project_id = X`). Messages stay in the feed forever — they are the conversation record.
+
+### Feed Capabilities
+
+- Post text messages (stored as messages)
+- Drop images, files, voice recordings, links (stored as content items)
 - Content items in the feed can be grabbed and moved into a project
 - Chronological ordering — newest at bottom, scroll up for history
 - Each feed item shows: author, timestamp, content type indicator, content
-- Feed items can be tagged or labeled for later reference
+- Content items can be tagged or labeled for later reference
 - Claude can be invoked in the feed (see [Claude Integration](claude-integration.md))
 
 ---

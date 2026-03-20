@@ -34,6 +34,20 @@
 
 ---
 
+## Phase 1 Design Approach
+
+No formal design system upfront. Design emerges during build:
+
+- **Palette:** Tailwind defaults initially, customize after core screens exist
+- **Typography:** Pick one warm font (e.g., Inter, Instrument Sans) from day 1
+- **Components:** Radix UI primitives, styled with Tailwind classes
+- **Dark mode:** From day 1 using Tailwind `dark:` variant
+- **Tokens:** Formalize (colors, spacing, radius, shadows) after feed + sidebar + project views exist
+
+Design system documentation (`specs/design-system.md`) will be created after Phase 1 based on what actually works.
+
+---
+
 ## Responsiveness
 
 - Not "desktop shrunk down" — genuinely redesigned for each breakpoint

@@ -40,8 +40,10 @@ sections
   created_by → users, created_at, updated_at
 
 content_items
-  id, type (idea/message/drawing/sketch/document/link/voice/photo/
+  id, type (idea/drawing/sketch/document/link/voice/photo/
        research/file),
+  -- Note: 'message' is NOT a content type. Discussion messages
+  -- live in the messages table. See discussions.md.
   title, body, media_url, media_type, metadata (JSONB),
   source (human/claude/agent/import), source_detail,
   project_id → projects (nullable), section_id → sections (nullable),
@@ -87,6 +89,26 @@ presence
   user_id → users, status (online/offline),
   current_location, last_heartbeat
 ```
+
+---
+
+## Feed Data Model
+
+The general feed is a **unified stream** joining two tables chronologically:
+
+```sql
+-- Feed view: messages + unassigned content items, interleaved by time
+SELECT id, 'message' AS source_table, content AS body, created_at, author_id
+  FROM messages WHERE discussion_id = :feed_discussion_id
+UNION ALL
+SELECT id, 'content_item' AS source_table, body, created_at, author_id
+  FROM content_items WHERE project_id IS NULL AND status = 'active'
+ORDER BY created_at ASC;
+```
+
+- **Chat messages** → `messages` table (permanent, never move)
+- **Captured content** (ideas, links, photos, voice, files) → `content_items` table with `project_id = NULL`
+- **Moving to a project** = `UPDATE content_items SET project_id = :project_id` (only content items, not messages)
 
 ---
 

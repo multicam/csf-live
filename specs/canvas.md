@@ -65,9 +65,29 @@ Leverage tldraw's custom shape system to create CSF Live-specific shapes:
 
 ---
 
+## Storage Model
+
+Canvas state is stored as **one content_item per canvas** with the entire tldraw JSON in `content_versions.media_data`:
+
+```
+content_items: { id: 'canvas-uuid', type: 'drawing' }
+content_versions: {
+  content_item_id: 'canvas-uuid',
+  version_number: 1,
+  media_data: { /* entire tldraw serialized state */ }
+}
+```
+
+This aligns with tldraw's native serialize/deserialize model. The full canvas state (all shapes, positions, connections) is one JSON blob per version.
+
+**Client-side debouncing:** Don't save on every shape edit. Auto-save after 3 seconds of inactivity or on page leave. Explicit "save" creates a named version. This keeps version counts manageable and reduces storage.
+
+**Draft recovery:** Store the current working state in `localStorage` as a crash recovery mechanism. On load, check if a localStorage draft is newer than the last persisted version and offer to restore.
+
 ## Versioning for Drawings
 
-- Every save of a tldraw canvas creates a new version
+- Auto-saves create versions silently (no user action needed)
+- Explicit saves can include a `change_summary` description
 - Version history shows: version number, author, timestamp, thumbnail preview
 - Users can view any previous version
 - Users can restore a previous version (creates a new version based on the old one)
