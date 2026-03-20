@@ -21,9 +21,15 @@
 
 ### Greenfield State
 
-No code exists. `packages/` directory does not exist. `specs/scenarios/` does not exist. TIER=1 confirmed.
+**Last verified**: 2026-03-21. Phases A–E are complete. Build Sequence §7 Phase F is the starting point.
 
-**Last verified**: 2026-03-21. All tasks in §1–3 remain unimplemented. Build Sequence §7 Phase A is the starting point.
+Phases A and B (Tasks 1.1–2.5) are fully implemented: monorepo, deps, types, router, Biome, Tailwind, Vitest, mock data, Zustand store, mock API, Minisearch, React Query hooks.
+
+Phase C (Tasks 3.1–3.5) is fully implemented: root layout/app shell, canvas scratchpad, 3-column feed shell, projects column, general feed.
+
+Phases D+E (Tasks 3.6–3.12) are fully implemented — see notes on each task below.
+
+**Routing architecture note:** All feed routes render `FeedShell` directly (passing col2/col3 as props) rather than using `_layout.tsx` nested layouts. TanStack Router's flat `routeTree.gen.ts` generation did not work with the nested `_layout.tsx` approach, so each route file at `feed/index.tsx`, `feed/$slug/index.tsx`, etc. renders the 3-column shell directly.
 
 ### Iteration 1 Gap Analysis (2026-03-21)
 
@@ -433,8 +439,10 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 **Tests:** `getFeedItems` returns correct merged union; message vs content item discrimination
 
-### Task 3.6 — Content Cards (All 9 Types)
+### Task 3.6 — Content Cards (All 9 Types) ✓ DONE
 **Source**: `feed.md` §Feed Item Rendering, `content.md` §Content Types
+
+Implemented: `ContentCard.tsx` dispatches to all 9 type-specific card components. Cards support click-to-select and selection highlighting. All 9 types are handled in `DetailColumn` with appropriate detail views.
 
 - `ContentCard.tsx` — dispatcher by `item.type`; container query context; click → navigate to detail route
 - `components/feed/cards/`:
@@ -456,7 +464,7 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 **Tests:** Each card renders without crashing; container query class logic
 
-### Task 3.7 — Compose Input (= Quick Capture)
+### Task 3.7 — Compose Input (= Quick Capture) ✓ DONE
 **Source**: `layout.md` §Compose Input, `feed.md` §Quick Capture
 
 - `ComposeInput.tsx` — bottom of Feed column, two modes:
@@ -478,8 +486,10 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 **Tests:** URL detection; mode switching; correct `discussionId` based on route; MediaRecorder start/stop
 
-### Task 3.8 — Project Feed (Column 2, `/feed/:slug`)
+### Task 3.8 — Project Feed (Column 2, `/feed/:slug`) ✓ DONE
 **Source**: `feed.md`, `projects.md`, `discussions.md`
+
+Implemented: `ProjectFeed.tsx` with `SectionChips` row, navigation between sections, and compose input. Section filter via `?section=:id` query param.
 
 - `ProjectFeed.tsx`:
   - `useProjectFeedItems(projectId, sectionId?)` — messages + content items merged, sorted newest-at-top
@@ -490,8 +500,10 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 **Tests:** Section filter logic; aggregate view labels section messages correctly
 
-### Task 3.9 — Project Dashboard (Column 3, project selected, no item)
+### Task 3.9 — Project Dashboard (Column 3, project selected, no item) ✓ DONE
 **Source**: `projects.md` §Project Dashboard
+
+Implemented: `ProjectDashboard.tsx` with inline-editable title and description, status badge/picker, section list with navigation, `CreateSectionDialog`, activity summary, and presence indicator for Ben.
 
 - `ProjectDashboard.tsx` — renders when route is `/feed/:slug` with no item sub-route:
   - Inline-editable title (click to edit, blur to save)
@@ -505,8 +517,10 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 **Tests:** Presence indicator shows for correct project; absent for others
 
-### Task 3.10 — Detail Column (Column 3) + Item Routing
+### Task 3.10 — Detail Column (Column 3) + Item Routing ✓ DONE
 **Source**: `layout.md` §Column 3
+
+Implemented: `DetailColumn.tsx` dispatcher with 10 detail views. All routes wired via TanStack Router `navigate()`. Each feed route passes the appropriate col3 content as a prop to `FeedShell` (see routing architecture note in Greenfield State).
 
 - `DetailColumn.tsx` — renders correct detail view based on route + selection:
   - No selection → `EmptyDetail.tsx` ("Select an item to view details")
@@ -528,8 +542,10 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 
 Clicking a feed item navigates to correct detail route via TanStack Router `navigate()`.
 
-### Task 3.11 — Document Viewer / Editor (TipTap)
+### Task 3.11 — Document Viewer / Editor (TipTap) ✓ DONE
 **Source**: `content.md` §Documents
+
+Implemented: `DocumentEditor.tsx` with TipTap StarterKit + Markdown extension, formatting toolbar, 2s auto-save debounce, and `VersionHistoryPanel.tsx` (read-only version list with disabled Restore button).
 
 - `DocumentEditor.tsx`:
   - `<EditorContent>` with `StarterKit` + `@tiptap/extension-markdown`
@@ -545,8 +561,10 @@ Clicking a feed item navigates to correct detail route via TanStack Router `navi
 
 **Tests:** Auto-save debounce creates new version; restore button is disabled
 
-### Task 3.12 — Drawing Detail Editor (tldraw in Column 3)
+### Task 3.12 — Drawing Detail Editor (tldraw in Column 3) ✓ DONE
 **Source**: `canvas.md` §Drawing Content Items
+
+Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStorage draft, explicit Save button that calls `useUpdateContentItemVersion()`, and `VersionHistoryPanel` reused from Task 3.11.
 
 - `DrawingEditor.tsx`:
   - `<Tldraw>` embedded in Detail column
@@ -913,41 +931,41 @@ All AI features are Phase 3. In Tier 1, `user-claude` exists in mock data with p
 
 ## 7. Build Sequence
 
-**Phase A — Foundation:**
-1. Task 1.1 Monorepo scaffolding
-2. Task 1.2 Dependency installation
-3. Task 1.3 Shared TypeScript types
-4. Task 1.4 TanStack Router configuration
-5. Task 1.5 Biome configuration
-6. Task 1.6 Tailwind v4 + dark mode setup
-7. Task 1.7 Vitest setup
+**Phase A — Foundation:** ✓ COMPLETE
+1. Task 1.1 Monorepo scaffolding ✓
+2. Task 1.2 Dependency installation ✓
+3. Task 1.3 Shared TypeScript types ✓
+4. Task 1.4 TanStack Router configuration ✓
+5. Task 1.5 Biome configuration ✓
+6. Task 1.6 Tailwind v4 + dark mode setup ✓
+7. Task 1.7 Vitest setup ✓
 
-**Phase B — Data layer (blocks all feature tasks):**
-8. Task 2.1 Seed data generation
-9. Task 2.2 Zustand mock store
-10. Task 2.3 Mock API module
-11. Task 2.4 Minisearch index
-12. Task 2.5 React Query hooks
+**Phase B — Data layer (blocks all feature tasks):** ✓ COMPLETE
+8. Task 2.1 Seed data generation ✓
+9. Task 2.2 Zustand mock store ✓
+10. Task 2.3 Mock API module ✓
+11. Task 2.4 Minisearch index ✓
+12. Task 2.5 React Query hooks ✓
 
-**Phase C — Core layout + first screens:**
-13. Task 3.1 Root layout + app shell
-14. Task 3.3 Feed layout (3-column shell)
-15. Task 3.2 Canvas scratchpad route
-16. Task 3.4 Projects column
-17. Task 3.5 General feed
+**Phase C — Core layout + first screens:** ✓ COMPLETE
+13. Task 3.1 Root layout + app shell ✓
+14. Task 3.3 Feed layout (3-column shell) ✓
+15. Task 3.2 Canvas scratchpad route ✓
+16. Task 3.4 Projects column ✓
+17. Task 3.5 General feed ✓
 
-**Phase D — Content rendering:**
-18. Task 3.6 Content cards (all 9 types)
-19. Task 3.7 Compose input / Quick Capture
-20. Task 3.10 Detail column + item routing
+**Phase D — Content rendering:** ✓ COMPLETE
+18. Task 3.6 Content cards (all 9 types) ✓
+19. Task 3.7 Compose input / Quick Capture ✓
+20. Task 3.10 Detail column + item routing ✓
 
-**Phase E — Project experience:**
-21. Task 3.8 Project feed
-22. Task 3.9 Project dashboard
-23. Task 3.11 Document editor (TipTap)
-24. Task 3.12 Drawing editor (tldraw in Detail)
+**Phase E — Project experience:** ✓ COMPLETE
+21. Task 3.8 Project feed ✓
+22. Task 3.9 Project dashboard ✓
+23. Task 3.11 Document editor (TipTap) ✓
+24. Task 3.12 Drawing editor (tldraw in Detail) ✓
 
-**Phase F — Views + search:**
+**Phase F — Views + search:** ← CURRENT STARTING POINT
 25. Task 3.13 Timeline mode
 26. Task 3.14 Categorized mode
 27. Task 3.15 Search UI
