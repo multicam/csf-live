@@ -176,7 +176,7 @@ All Claude invocations follow the same pattern:
 - Upgrade to Max/SDK later if costs justify it
 
 **Option B: Max subscription via CLI/SDK**
-- Anthony's and Ben's Max subscriptions authenticated on the server
+- JM's and Ben's Max subscriptions authenticated on the server
 - App routes invocations to the correct user's CLI session based on who triggered it
 - Two separate `~/.claude/` profiles or session tokens
 - Risk: auth tokens expire, require manual re-auth, CLI updates can break sessions
@@ -493,7 +493,7 @@ async function assembleContext(params: {
 
 ```
 You are Claude, an AI assistant integrated into CSF Live — a collaborative workspace
-used by Anthony and Ben for capturing ideas, discussing, and shaping projects.
+used by JM and Ben for capturing ideas, discussing, and shaping projects.
 
 You are participating in a discussion. Your responses should be:
 - Concise and actionable
