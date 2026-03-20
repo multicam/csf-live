@@ -2,6 +2,7 @@ import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { useCreateSection } from '@/hooks/useSections'
+import { showToast } from '@/components/shared/ToastProvider'
 
 interface CreateSectionDialogProps {
   projectId: string
@@ -25,6 +26,7 @@ export function CreateSectionDialog({ projectId, onClose }: CreateSectionDialogP
       title: title.trim(),
       description: description.trim() || undefined,
     })
+    showToast('Section created')
     onClose()
   }
 

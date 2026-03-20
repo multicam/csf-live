@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { useProjects } from '@/hooks/useProjects'
 import { useSections } from '@/hooks/useSections'
 import { useMoveContentItem, useCopyContentItem } from '@/hooks/useContentItem'
+import { showToast } from '@/components/shared/ToastProvider'
 import { cn } from '@/lib/utils'
 
 interface MoveItemDialogProps {
@@ -80,13 +81,19 @@ export function MoveItemDialog({ itemId, mode, onClose }: MoveItemDialogProps) {
     if (!hasSelection) return
 
     const mutation = mode === 'move' ? moveItem : copyItem
+    const successMessage = mode === 'move' ? 'Item moved successfully' : 'Item copied successfully'
     mutation.mutate(
       {
         itemId,
         projectId: selectedProjectId,
         sectionId: isUnassign ? null : selectedSectionId,
       },
-      { onSuccess: onClose }
+      {
+        onSuccess: () => {
+          showToast(successMessage)
+          onClose()
+        },
+      }
     )
   }
 

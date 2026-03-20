@@ -3,6 +3,7 @@ import { Outlet } from '@tanstack/react-router'
 import { AppMenu } from '@/components/shared/AppMenu'
 import { NotificationPanel } from '@/components/shared/NotificationPanel'
 import { ProjectsColumn } from '@/components/projects/ProjectsColumn'
+import { MobileTabBar } from '@/components/shared/MobileTabBar'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { cn } from '@/lib/utils'
 
@@ -80,13 +81,32 @@ export function FeedShell({ children, col3 }: FeedShellProps) {
     [col1Width]
   )
 
+  const [mobileTab, setMobileTab] = useState<'projects' | 'feed' | 'detail'>('feed')
+  const hasDetail = col3 != null
+
   if (breakpoint === 'mobile') {
     return (
       <div className="flex h-screen flex-col">
-        <div className="flex-1 overflow-hidden">
-          {children ?? <Outlet />}
+        <div className="fixed top-2 left-2 z-40">
+          <AppMenu onNotificationsOpen={() => setNotificationOpen(true)} />
         </div>
-        {/* Mobile tab bar placeholder */}
+        <NotificationPanel open={notificationOpen} onClose={() => setNotificationOpen(false)} />
+
+        <div className="flex-1 overflow-hidden pb-16">
+          {mobileTab === 'projects' && <ProjectsColumn />}
+          {mobileTab === 'feed' && (children ?? <Outlet />)}
+          {mobileTab === 'detail' && hasDetail && col3}
+          {mobileTab === 'detail' && !hasDetail && (children ?? <Outlet />)}
+        </div>
+
+        <MobileTabBar
+          activeTab={mobileTab === 'feed' ? 'feed' : mobileTab === 'projects' ? 'projects' : 'detail'}
+          onTabChange={(tab) => {
+            if (tab === 'canvas') return
+            setMobileTab(tab as 'projects' | 'feed' | 'detail')
+          }}
+          hasDetail={hasDetail}
+        />
       </div>
     )
   }

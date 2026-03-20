@@ -3,6 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { useNavigate } from '@tanstack/react-router'
 import { X } from 'lucide-react'
 import { useCreateProject } from '@/hooks/useProjects'
+import { showToast } from '@/components/shared/ToastProvider'
 
 interface CreateProjectDialogProps {
   onClose: () => void
@@ -25,6 +26,7 @@ export function CreateProjectDialog({ onClose }: CreateProjectDialogProps) {
       title: title.trim(),
       description: description.trim() || undefined,
     })
+    showToast('Project created')
     onClose()
     navigate({ to: '/feed/$slug', params: { slug: project.slug } })
   }
