@@ -15,17 +15,28 @@
 
 There are two distinct canvas contexts:
 
-### 1. Project Canvas (Spatial View)
-- The spatial view of a project IS a tldraw canvas
-- Content items from the project appear as cards/shapes on the canvas
-- Users can draw around them, connect them with arrows, annotate
-- This is where the "Mac desktop with files you can draw on" experience lives
+### 1. App-Level Scratchpad (`/`)
 
-### 2. Standalone Drawing Documents
-- A user creates a new drawing within a project
-- Full tldraw experience — freehand, shapes, text, arrows, connectors
-- Saved as a versioned document (the tldraw JSON is the document content)
-- Can be opened, edited, versioned like any other document
+The home screen is a full-screen tldraw canvas — a shared scratchpad for the team. See [Layout](layout.md).
+
+- Full tldraw experience: draw, shapes, text, arrows, images
+- Clickable navigation nodes: project cards, "Feed" entry point
+- **Save** → snapshots the canvas as a new `drawing` content item in the feed (or targeted project). Canvas content persists, version is recorded.
+- **Save and Close** → same snapshot → canvas is **wiped clean** (blank slate for next session)
+- The scratchpad is versioned — each save creates a version of the canvas document itself
+
+This is where visual thinking happens. When the thinking is ready to be organized, save it to the feed.
+
+### 2. Drawing Content Items (in Detail Column)
+
+Drawings are content items (type: `drawing`) that live in the feed or a project. They are created when the scratchpad is saved, or created directly within a project.
+
+- Click a `drawing` item in the Feed column → opens as a fully editable tldraw canvas in the **Detail column** (column 3 of the `/feed/*` layout)
+- Full tldraw experience within the Detail column
+- Versioned: every save creates a new version
+- Can be opened, edited, shared like any other content item
+
+**Project drawings are NOT a background canvas.** They are feed items edited inline in the 3-column layout.
 
 ---
 
@@ -45,11 +56,19 @@ There are two distinct canvas contexts:
 
 ---
 
+## Tier 1 Custom Shapes
+
+Custom tldraw shapes for the app-level scratchpad:
+
+- **Project node** — a clickable shape representing a project. Displays: project title, status, unread count. Clicking navigates to `/feed/:slug`. Used on the scratchpad as spatial navigation.
+- **Feed node** — a clickable shape that navigates to `/feed`. The entry point to the 3-column layout from the canvas.
+
+---
+
 ## Custom Shapes (Phase 2+)
 
-Leverage tldraw's custom shape system to create CSF Live-specific shapes:
+Leverage tldraw's custom shape system to create additional CSF Live-specific shapes:
 
-- **Idea card** — a shape representing a Content Item, showing title and type
 - **Project link** — a shape that links to another project
 - **Research node** — a shape showing a research summary with source link
 - **Decision marker** — a shape indicating a decision was made, with rationale

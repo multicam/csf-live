@@ -2,7 +2,8 @@
 
 **Version**: 2.0
 **Date**: 2026-03-21
-**Related**: All spec files. [Tech Stack](techstack-study.md), [SDD](sdd.md)
+**Related**: All spec files. [Layout](layout.md), [Tech Stack](techstack-study.md), [SDD](sdd.md)
+**Wireframe**: [tldraw wireframe](https://www.tldraw.com/f/wzJnSeYy6Ndbua3N3Ui9T?d=v15.-219.2166.2399.page) | Export: `specs/CSF-Live-V1.tldr`
 
 ---
 
@@ -28,7 +29,7 @@ A **comprehensive mock dataset** is generated at the start of Phase 1 and evolve
 
 Generate a large, realistic dataset covering all content types and states:
 
-- **2 users**: JM (owner), Ben (owner) — with avatars, roles
+- **3 users**: JM (owner), Ben (owner), Claude (system — for AI-authored content and responses)
 - **4 projects**: active, active, paused, archived — with descriptions, slugs
 - **8 sections** across projects — with descriptions, ordering
 - **60+ content items** across all 9 types (idea, drawing, sketch, document, link, voice, photo, research, file)
@@ -36,33 +37,82 @@ Generate a large, realistic dataset covering all content types and states:
 - **15+ tags** with cross-project usage
 - **Version history** on 5 documents and 2 drawings
 - **10+ notifications** (mix of read/unread, different types)
-- **Presence state** for both users
-- **1 tldraw canvas** with serialized JSON state
+- **Presence state**: JM as online on the current page, Ben as online in a specific project (static, does not update during session)
+- **1 tldraw canvas**: minimal valid tldraw document with a few shapes (text label, rectangle, arrow) — not a blank canvas
+- **Discussions**: 1 feed discussion (`context_type='feed'`, `context_id=NULL`) with a well-known ID used throughout mock data; 1 discussion per project (`context_type='project'`); 1 discussion per section (`context_type='section'`)
 - **Feed content**: mix of messages and unassigned content items interleaved chronologically
 
 Dataset lives in `packages/web/src/mocks/` as typed TypeScript objects matching the shared types.
+
+### Mock Mutations
+
+The mock API layer uses an in-memory Zustand store so that writes persist for the duration of the browser session. Posting a message, moving content, and creating a project all update the store and are reflected immediately in the UI — without a real backend.
+
+Pattern for mock mutations:
+
+```typescript
+// packages/web/src/mocks/store.ts
+import { create } from 'zustand';
+import { initialMockData } from './data';
+
+export const useMockStore = create((set, get) => ({
+  ...initialMockData,
+
+  postMessage: (discussionId: string, content: string, authorId: string) => {
+    const newMessage = {
+      id: crypto.randomUUID(),
+      discussionId,
+      content,
+      authorId,
+      createdAt: new Date().toISOString(),
+    };
+    set((state) => ({ messages: [...state.messages, newMessage] }));
+    return newMessage;
+  },
+
+  moveContentItem: (itemId: string, projectId: string | null) => {
+    set((state) => ({
+      contentItems: state.contentItems.map((item) =>
+        item.id === itemId ? { ...item, projectId } : item
+      ),
+    }));
+  },
+}));
+```
+
+The `mockApi` module reads from and writes to this store. Phase 2 backend integration replaces only the `mockApi` implementation — no component changes required.
+
+### Tier 1 Constraints (Mock Layer)
+
+- **Client-side search**: implemented via [minisearch](https://github.com/lucasc/minisearch) or [fuse.js](https://fusejs.io/) against mock data in the Zustand store. No server required.
+- **Voice / photo capture**: creates a local blob URL (session only). The URL is not persisted and disappears on page reload. Full upload to R2 is Phase 2.
+- **Link previews**: pre-populated in mock data. New links posted during a session show as plain URL — no live metadata fetch.
+- **Realtime delivery to other user**: Tier 2 only. Requires WebSocket infrastructure. In Tier 1, the second user's view is static mock data.
+- **Version restore**: read-only in Tier 1. Users can view old versions but clicking "Restore" is a no-op (or shows a "coming in Phase 2" hint). Creating a new version from a restore requires the real backend.
+- **Spatial positions**: JM-only in Tier 1. There is no per-user spatial state — all users see the same canvas positions. Per-user layout is Phase 2+.
 
 ### Frontend Deliverables
 
 | Feature | Scenarios | Spec |
 |---------|-----------|------|
-| **Sidebar + navigation** | Login, navigate, responsive breakpoints | [Feed](feed.md), [Design](design.md) |
+| **Canvas scratchpad (`/`)** | Full-screen tldraw, save/save-and-close to feed, project+feed nav nodes | [Canvas](canvas.md), [Layout](layout.md) |
+| **3-column feed (`/feed`)** | Projects column, feed column, detail column, resizable, responsive | [Layout](layout.md), [Feed](feed.md), [Design](design.md) |
 | **General Feed** | View messages + content items, post message, scroll history | [Feed](feed.md), [Discussions](discussions.md) |
-| **Quick Capture** | Modal/sheet, text/link/photo capture, targeting | [Feed](feed.md#quick-capture) |
+| **Compose input (= Quick Capture)** | Text posting, enhanced mode with voice/camera/file/targeting | [Feed](feed.md#quick-capture), [Layout](layout.md#compose-input) |
 | **Project list** | View projects, status indicators, create project | [Projects](projects.md) |
 | **Project dashboard** | Title, sections, activity summary, entry points | [Projects](projects.md) |
 | **Section navigation** | Section list, section discussion, root view with labels | [Projects](projects.md) |
 | **Content items** | Render all 9 types, content cards, metadata display | [Content](content.md) |
 | **Content fluidity** | Move to project, copy, drag-and-drop (desktop) | [Content](content.md#content-fluidity) |
-| **Timeline view** | Chronological list, filters, infinite scroll | [Views](views.md) |
-| **Spatial view (tldraw)** | Canvas with content items as shapes, draw, annotate | [Canvas](canvas.md), [Views](views.md) |
-| **Categorized view** | Group by type, collapsible sections, counts | [Views](views.md) |
+| **Timeline mode (list panel)** | Chronological list, filters, infinite scroll | [Views](views.md) |
+| **Spatial canvas (tldraw)** | Canvas as permanent background, content items as shapes in project mode, draw, annotate | [Canvas](canvas.md), [Layout](layout.md) |
+| **Categorized mode (list panel)** | Group by type, collapsible sections, counts | [Views](views.md) |
 | **Search UI** | Search bar, filter chips, result list (mock results) | [Search](search.md) |
 | **Document viewer/editor** | Markdown rendering, TipTap editing, version history | [Content](content.md#documents) |
 | **Standalone drawing** | tldraw full canvas, save, version list | [Canvas](canvas.md) |
-| **Notification panel** | Bell icon, unread count, notification list | [Notifications](notifications.md) |
-| **Presence indicators** | Online/offline dots, "Ben is in this project" | [Notifications](notifications.md#presence-and-awareness) |
-| **Responsive layouts** | Mobile (single column, bottom nav), tablet (2-panel), desktop (multi-panel) | [Design](design.md) |
+| **Notification panel** | App Menu → notifications in workspace panel, unread count | [Notifications](notifications.md) |
+| **Presence indicators** | Online/offline in App Menu, canvas-edge avatar for "Ben is in this project" | [Notifications](notifications.md#presence-and-awareness) |
+| **Responsive layouts** | Mobile (one panel at a time, swipe), tablet (both panels, touch), desktop (resizable panels, keyboard shortcuts) | [Layout](layout.md), [Design](design.md) |
 | **Dark mode** | Full dark mode via Tailwind `dark:` variant | [Design](design.md) |
 
 ### Data Fetching Pattern

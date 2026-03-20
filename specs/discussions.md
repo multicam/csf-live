@@ -13,11 +13,22 @@ Discussions are linear message threads. No sub-threading, no branching.
 
 ## Discussion Contexts
 
-| Context | Scope | Behavior |
-|---------|-------|----------|
-| General Feed | Platform-wide | One continuous discussion between platform owners |
-| Project Root | Per project | Shows all messages across all sections, labeled by section |
-| Section | Per section | Focused discussion for that section only |
+| Context | `context_type` | `context_id` | Behavior |
+|---------|---------------|-------------|----------|
+| General Feed | `feed` | NULL | One continuous discussion between platform owners. Single row, well-known ID. |
+| Project | `project` | `project_id` | Each project has its own discussion thread for project-wide messages. Messages posted at the project root level go here. |
+| Section | `section` | `section_id` | Focused discussion for that section only. |
+
+### Project Root VIEW (Aggregate Display)
+
+The project root **view** is not a separate discussion thread — it is a read aggregate. It displays:
+
+1. Messages from the project's own discussion thread (`context_type = 'project'`, `context_id = project.id`)
+2. Messages from all of that project's section discussions, each labeled with their section name
+
+All messages are interleaved chronologically. This gives an overview of all project activity in one stream while maintaining section attribution. Users can click a section label to jump into that section's focused discussion.
+
+**Key rule:** When a user posts a message while viewing the project root, that message goes into the project's own discussion thread (`context_type = 'project'`), not into any section.
 
 ---
 
@@ -50,6 +61,3 @@ Discussions are linear message threads. No sub-threading, no branching.
 
 ---
 
-## Within a Project: Section Labels
-
-When viewing the project root discussion, each message shows which section it belongs to. This gives an overview of all project activity in one stream while maintaining section attribution. Users can click a section label to jump into that section's focused discussion.

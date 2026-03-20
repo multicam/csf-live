@@ -44,6 +44,9 @@ content_items
        research/file),
   -- Note: 'message' is NOT a content type. Discussion messages
   -- live in the messages table. See discussions.md.
+  -- Note: For items with type='document', document_type (note/prd/blueprint/
+  -- work-orders/research-summary/meeting-notes/freeform) lives in metadata JSONB,
+  -- not as a dedicated column. Access as: metadata->>'document_type'.
   title, body, media_url, media_type, metadata (JSONB),
   source (human/claude/agent/import), source_detail,
   project_id → projects (nullable), section_id → sections (nullable),
@@ -53,8 +56,11 @@ content_items
 
 content_versions
   id, content_item_id → content_items, version_number,
-  body, media_data (JSONB — for tldraw JSON etc.),
+  body,            -- text content for documents/ideas (field is named 'body', not 'content')
+  media_data,      -- JSONB — for tldraw JSON, audio metadata, etc.
   author_id → users, change_summary, created_at
+  -- Schema is source of truth for field names. content.md version properties
+  -- table must use 'body' + 'media_data', not a single 'content' field.
 
 tags
   id, name (unique, lowercase)
@@ -65,6 +71,9 @@ content_item_tags
 discussions
   id, context_type (feed/project/section),
   context_id (nullable — project_id or section_id),
+  -- Feed discussion: context_type='feed', context_id=NULL, single row with well-known ID.
+  -- Project discussion: context_type='project', context_id=project_id, one row per project.
+  -- Section discussion: context_type='section', context_id=section_id, one row per section.
   created_at
 
 messages

@@ -80,7 +80,7 @@ Responsive website. Not a native app, not an Electron wrapper. A well-built web 
 ### Device Targets
 
 **Desktop (primary work environment)**
-- Full experience — sidebar, multi-panel views, canvas drawing, keyboard shortcuts
+- Full experience — canvas-first layout with floating panels, keyboard shortcuts. See [Layout](layout.md).
 - Where deep work happens — project editing, drawing, long discussions
 
 **Tablet (Ben's primary drawing device)**

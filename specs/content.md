@@ -94,7 +94,7 @@ Documents are a special class of Content Item with richer capabilities:
 
 - **Editable** — full markdown editing in the browser
 - **Versioned** — every save creates a new version with author attribution
-- **Typed** — documents have a document_type field: `note`, `prd`, `blueprint`, `work-orders`, `research-summary`, `meeting-notes`, `freeform`
+- **Typed** — documents have a document type: `note`, `prd`, `blueprint`, `work-orders`, `research-summary`, `meeting-notes`, `freeform`. This value is stored in `content_items.metadata` JSONB as `metadata->>'document_type'` — there is no dedicated column. See [data-model.md](data-model.md).
 - **AI-generated documents** are clearly marked with `source: claude` and are fully editable by humans
 - **Version history** is browseable — you can see who changed what and when, and revert to a previous version
 
@@ -154,10 +154,13 @@ Nothing is locked in place. Content should flow freely between contexts.
 | `id` | UUID | Version identifier |
 | `content_item_id` | UUID | Parent content item |
 | `version_number` | integer | Sequential (1, 2, 3...) |
-| `content` | text/JSON | The content at this version |
+| `body` | text | Text content at this version (markdown for documents, raw text for ideas) |
+| `media_data` | JSONB | Binary/structured content (tldraw JSON for drawings, audio metadata, etc.) |
 | `author_id` | UUID | Who made this version |
 | `change_summary` | text | Optional description of what changed |
 | `created_at` | timestamp | When this version was created |
+
+> **Field names:** `body` and `media_data` match the `content_versions` table in [data-model.md](data-model.md). The field is **not** named `content`.
 
 ### Version History UI
 

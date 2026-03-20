@@ -43,13 +43,15 @@ Projects can be created:
 
 ### Project Dashboard
 
-When you open a project, you see:
+When you enter a project with no item selected, the **Workspace Panel** (left) shows the project dashboard:
 
 - Project title and description (editable)
 - Section list (if sections exist)
 - Activity summary (recent items, who contributed)
-- Entry points: Discussion, Canvas, Documents, Search within project
-- View switcher (timeline, spatial, categorized, search — see [Views](views.md))
+
+The canvas simultaneously becomes that project's spatial view (content items as custom card shapes). The List Panel shows project content items.
+
+Entry points for project actions (project settings, add section, add content, view options) live in the **Context Menu** (top-right) and in the Workspace Panel. See [Layout](layout.md) for the panel and context menu structure. List Panel modes (timeline, categorized, search) are described in [Views](views.md).
 
 ---
 

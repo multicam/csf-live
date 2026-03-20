@@ -25,6 +25,7 @@ CSF Live is a private, collaborative AI workspace where a small team captures id
 | [search.md](search.md) | Full-text search, filters, natural language search |
 | [notifications.md](notifications.md) | Presence, awareness, notification triggers & delivery |
 | [housekeeping.md](housekeeping.md) | Lifecycle management, pipeline integration, future considerations |
+| [layout.md](layout.md) | Canvas-first layout, floating panels, navigation model, responsive behavior |
 | [design.md](design.md) | Frontend design principles, aesthetic direction, responsiveness |
 
 ### Technical
@@ -59,6 +60,10 @@ CSF Live is a private, collaborative AI workspace where a small team captures id
 | Auth | WorkOS AuthKit |
 | Canvas | tldraw SDK |
 | Hosting | Vercel/CF Pages (frontend) + Railway/Fly.io (API) |
+
+### Wireframe
+
+[tldraw wireframe](https://www.tldraw.com/f/wzJnSeYy6Ndbua3N3Ui9T?d=v15.-219.2166.2399.page) | Export: `specs/CSF-Live-V1.tldr`
 
 ### Core Design Philosophy
 

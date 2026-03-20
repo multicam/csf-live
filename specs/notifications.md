@@ -10,13 +10,13 @@
 ### Platform Level
 
 - Simple presence indicator: who is currently online
-- Shown in the sidebar — small avatar with green dot for online users
+- Shown in the **App Menu** (top-left) as an inline indicator — small avatar with green dot for online users
 - No "last seen" timestamps or detailed status (keep it minimal)
 
 ### Project Level
 
 - When inside a project, you can see if the other person is also in that project
-- Indicator: "Ben is in this project" with optional current section
+- Indicator: "Ben is in this project" with optional current section — shown as a subtle avatar overlay on the canvas edge (e.g., Ben's avatar positioned at the canvas boundary indicating his location)
 - No cursor tracking, no live viewport sync
 - Sufficient for awareness: "I know Ben is looking at this too"
 
@@ -47,8 +47,8 @@
 ### Delivery Methods
 
 **In-app:**
-- Notification bell/icon in sidebar with unread count
-- Notification panel with list of recent notifications
+- Notifications accessible via the **App Menu** (top-left) — opens notification list in the Workspace Panel (left)
+- Notification list with unread count shown in the App Menu
 - Click notification to navigate to relevant content
 - Mark as read, mark all as read
 
@@ -59,6 +59,7 @@
 
 ### Visual Indicators
 
-- Unread count badges on: sidebar items, project cards, section headers
+- Unread count badge on the App Menu button
+- Unread count badges on: project cards (in the List Panel), section headers
 - New content highlighted in the feed/discussion (e.g., "2 new messages" divider)
-- Activity indicators on project cards in the sidebar
+- Activity indicators on project cards in the List Panel

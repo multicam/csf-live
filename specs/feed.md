@@ -9,22 +9,20 @@
 
 ### What the User Sees on Login
 
-The home screen has a **sidebar** for navigation and a **main content area** that defaults to the General Feed.
+The home screen (`/`) is a full-screen tldraw canvas — the shared scratchpad. Projects and a "Feed" entry point appear as clickable nodes on the canvas. Click a project → `/feed/:slug`. Click Feed → `/feed`.
 
-### Sidebar
+The feed layout (`/feed`) is a 3-column email client:
+- **Column 1 (left)**: Projects list — click to scope the feed to a project
+- **Column 2 (center)**: Feed — messages + content items
+- **Column 3 (right)**: Detail — editor/viewer for the selected item (including tldraw for drawings)
 
-- **Feed** — the shared general discussion (default view on login)
-- **Projects** — list of active projects, with status indicators
-- **Quick Capture** — persistent button/shortcut available from anywhere
-- **Search** — global search entry point
-- **Notifications** — unread count badge
-- **User presence** — who's online (subtle indicator)
-
-The sidebar feel should be soft, warm, conversational. Not corporate. Think Mud/Matter-style aesthetic — rounded, breathing, organic (see [Design Principles](design.md)).
+The compose input at the bottom of column 2 **is** Quick Capture — one input with two modes (simple text or enhanced with voice/camera/file/targeting). See [Layout](layout.md) for the full model.
 
 ### General Feed
 
-The feed is the default shared space. It behaves like a linear discussion between platform owners (like a Slack DM channel) mixed with captured content. Everything that doesn't belong to a project lives here.
+The feed (`/feed`) is the default shared space. It behaves like a linear discussion between platform owners (like a Slack DM channel) mixed with captured content. Everything that doesn't belong to a project lives here. The feed lives in the center column.
+
+When a project is selected (`/feed/:project-slug`), the feed column scopes to that project's content items and discussion messages. The canvas becomes the project's spatial view.
 
 ### Feed Data Model
 
@@ -57,9 +55,16 @@ Minimize friction between "I have an idea" and "it's in CSF Live." This is criti
 
 ### Entry Points
 
-1. **Persistent button** in the sidebar or bottom nav (mobile) — always accessible
-2. **Keyboard shortcut** on desktop (e.g., `Cmd+K` or `Cmd+N`)
+1. **App Menu** — Quick Capture accessible from the App Menu dropdown (top-left), or a floating action button (FAB) on mobile
+2. **Keyboard shortcut** on desktop (`Cmd+N`) — opens Quick Capture in the workspace panel
 3. **Share target** (Phase 2 PWA) — share from other apps directly to CSF Live
+
+### Quick Capture Platform
+
+The Quick Capture UI adapts to the device context:
+
+- **Mobile / tablet**: bottom sheet sliding up from the bottom edge
+- **Desktop**: centered modal
 
 ### Quick Capture Interface
 
@@ -86,3 +91,31 @@ The default is quick dump. Targeting is optional and should not slow down the ca
 - If voice: transcription begins in background, item shows audio player while processing
 - If image: thumbnail displayed immediately, any processing (OCR, description) happens in background
 - If URL: link preview card generated asynchronously
+
+---
+
+## Feed Item Rendering
+
+The feed is a unified stream of two distinct item types rendered differently:
+
+### Message Rendering (Chat Bubble Style)
+
+Messages (`messages` table) render as chat bubbles — compact, author avatar on the side, timestamp inline. Styled conversationally, similar to a messaging app.
+
+### Content Item Rendering (Card Style)
+
+Content items (`content_items` table) render as cards — more prominent, with type-specific layout. Each card type:
+
+| Type | Card Contents |
+|------|--------------|
+| `idea` | Body text, author avatar, timestamp |
+| `link` | URL with link preview card: title, description, favicon. In Tier 1, previews are pre-populated in mock data. New links posted during the session show as plain URL (no live fetch). |
+| `voice` | Audio player with play/pause button, duration indicator, waveform placeholder. In Tier 1, mock audio URLs. |
+| `photo` | Thumbnail image, author avatar, timestamp |
+| `sketch` | Thumbnail image, "Sketch" type label, author avatar, timestamp |
+| `drawing` | Thumbnail preview of the tldraw canvas, title |
+| `document` | Title, `document_type` badge (e.g., "PRD", "Note"), first line of body as preview |
+| `research` | Title, "AI Research" badge, summary preview (first ~100 chars) |
+| `file` | Filename, file size, file type icon, download action. Download is disabled in Tier 1 (no real file storage). |
+
+> **Note:** Message rendering and content item rendering are intentionally distinct visual treatments. Messages feel conversational; content items feel like objects you can act on (move, tag, open).

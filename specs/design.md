@@ -20,6 +20,7 @@
 ## Interaction Quality
 
 - **Transitions**: Smooth, purposeful. View switching should feel like turning a page, not reloading.
+- **View switching**: Data is instant (no refetch — already loaded). Visual transition is a brief crossfade: 200–300ms. Not a hard cut.
 - **Feedback**: Every action has a visible response — optimistic UI updates, subtle toasts, progress indicators.
 - **Touch-friendly**: All interactive elements sized for finger/stylus on tablet. No tiny click targets.
 - **Keyboard-first on desktop**: Power users can navigate, search, create, and switch views without touching the mouse.
@@ -30,7 +31,17 @@
 
 - Content is the star. Chrome (navigation, controls) should recede.
 - Use size, weight, and color to create clear hierarchy — not borders and dividers.
-- Empty states should be inviting, not blank. "No content yet — drop an idea here or start a discussion."
+- Empty states should be inviting, not blank.
+
+### Empty State Copy
+
+| Context | Empty State Message |
+|---------|-------------------|
+| Empty Feed | "Start a conversation or capture an idea." |
+| Empty Project | "Add a section or drop content here to get started." |
+| Empty Section | "Nothing here yet — drop an idea, link, or document into this section." |
+| Empty Search Results | "No results found. Try different keywords or adjust your filters." |
+| Empty Notification Panel | "You're all caught up." |
 
 ---
 
@@ -42,7 +53,7 @@ No formal design system upfront. Design emerges during build:
 - **Typography:** Pick one warm font (e.g., Inter, Instrument Sans) from day 1
 - **Components:** Radix UI primitives, styled with Tailwind classes
 - **Dark mode:** From day 1 using Tailwind `dark:` variant
-- **Tokens:** Formalize (colors, spacing, radius, shadows) after feed + sidebar + project views exist
+- **Tokens:** Formalize (colors, spacing, radius, shadows) after feed + panels + project views exist
 
 Design system documentation (`specs/design-system.md`) will be created after Phase 1 based on what actually works.
 
@@ -51,6 +62,7 @@ Design system documentation (`specs/design-system.md`) will be created after Pha
 ## Responsiveness
 
 - Not "desktop shrunk down" — genuinely redesigned for each breakpoint
-- Mobile: single column, bottom nav, swipe gestures, quick capture prominent
-- Tablet: two-panel (sidebar + main), full canvas support, touch optimized
-- Desktop: multi-panel option, keyboard shortcuts, hover states, drag and drop
+- The layout is universal: canvas background + floating panels on all devices. See [Layout](layout.md) for the full responsive model.
+- Mobile: one panel visible at a time, swipe between list and workspace, full-screen canvas mode when panels are hidden
+- Tablet: both panels visible but narrower, full canvas support, touch and stylus optimized
+- Desktop: both panels visible side-by-side, resizable, keyboard shortcuts, hover states, drag and drop

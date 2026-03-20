@@ -245,6 +245,7 @@ Feature: Feed Messaging
     And the message shows JM as the author
     And the message shows the current timestamp
 
+  # Tier 2 only — requires WebSocket infrastructure. Not validated in Phase 1 mock tier.
   Scenario: Realtime delivery to other user
     Given Ben is logged in on another session
     And Ben is on the feed page

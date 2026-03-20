@@ -44,7 +44,7 @@ The stack was chosen through systematic evaluation against CSF Live's core requi
 | **Background jobs** | BullMQ + Redis (or simple in-process queue) | BullMQ + Redis (unchanged) |
 | **Authentication** | WorkOS AuthKit | Passphrase-based / Supabase Auth |
 | **Canvas/Drawing** | tldraw SDK | unchanged |
-| **Rich text** | TipTap or Milkdown | unchanged |
+| **Rich text** | TipTap | unchanged |
 
 ### Why This Stack
 
@@ -131,34 +131,35 @@ CSF Live is ~90% interactive client-side code: tldraw canvas, realtime chat, ric
 
 ### Routing
 
-React Router v7 or TanStack Router — both support:
+TanStack Router — supports:
 - File-based or config-based route definitions
 - Nested layouts (sidebar + project + section)
 - URL params for project slugs, section IDs, document IDs
 - Lazy loading per route
 
-### Routing Structure (Preliminary)
+### Routing Structure
+
+3-column layout with URL-driven context. See [layout.md](layout.md) for the full model.
 
 ```
 src/
 ├── routes/
-│   ├── _layout.tsx               # Root layout (auth check, sidebar, providers)
-│   ├── feed.tsx                  # General Feed
-│   ├── projects/
-│   │   ├── index.tsx             # Project list
-│   │   ├── new.tsx               # Create project
+│   ├── _layout.tsx               # Root layout (auth, global state, providers)
+│   ├── index.tsx                 # / — Canvas scratchpad (full-screen tldraw)
+│   ├── feed/
+│   │   ├── _layout.tsx           # Feed layout (3-column email client shell)
+│   │   ├── index.tsx             # /feed — global feed
 │   │   └── $slug/
-│   │       ├── _layout.tsx       # Project layout (header, section nav)
-│   │       ├── index.tsx         # Project dashboard
-│   │       ├── discussion.tsx    # Project root discussion
-│   │       ├── canvas.tsx        # Spatial view (tldraw)
-│   │       ├── documents/
-│   │       │   └── $id.tsx       # Document viewer/editor
-│   │       └── sections/
-│   │           └── $id.tsx       # Section view
-│   ├── search.tsx                # Global search
-│   └── settings.tsx              # Settings
+│   │       ├── index.tsx         # /feed/:slug — project feed
+│   │       ├── doc.$id.tsx       # /feed/:slug/doc/:id — document in Detail
+│   │       └── item.$id.tsx      # /feed/:slug/item/:id — item in Detail
+│   └── search.tsx                # /search?q=... — search results in Feed column
 ```
+
+Two modes:
+- `/` = Canvas scratchpad (full-screen tldraw, no columns). Saves produce feed items.
+- `/feed/*` = 3-column email-client layout. Drawings open as tldraw editor in Detail column.
+- See [layout.md](layout.md) for the full model
 
 ### Data Fetching
 
@@ -536,10 +537,10 @@ No timeouts to worry about. The persistent server process is the core advantage 
 | **Styling** | Tailwind CSS 4 | Utility-first, fast iteration, responsive built-in |
 | **UI primitives** | Radix UI (unstyled) | Accessible, composable, style-agnostic |
 | **Canvas/Drawing** | tldraw SDK (hobby license) | Best-in-class embeddable canvas for React |
-| **Rich text editing** | TipTap or Milkdown | Markdown document editing in-browser |
+| **Rich text editing** | TipTap | Markdown document editing in-browser |
 | **State management (server)** | React Query (TanStack Query) | Caching, deduplication, cache invalidation on WebSocket events |
 | **State management (local)** | Zustand | Lightweight, TypeScript-native, for UI state (view prefs, canvas viewport) |
-| **Routing** | React Router v7 or TanStack Router | File-based routing, nested layouts |
+| **Routing** | TanStack Router | File-based routing, nested layouts |
 | **Markdown rendering** | react-markdown + remark plugins | Rendering document content |
 | **Mermaid diagrams** | mermaid.js | Structured diagrams Claude can generate |
 | **Icons** | Lucide React | Clean, consistent, open-source |
