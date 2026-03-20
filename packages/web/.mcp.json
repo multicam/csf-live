@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "react-grab-mcp": {
+      "command": "react-grab",
+      "args": ["mcp"]
+    },
     "brave-devtools": {
       "command": "chrome-devtools-mcp",
       "args": [
