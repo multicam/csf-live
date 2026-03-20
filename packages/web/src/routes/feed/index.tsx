@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { FeedColumn } from '@/components/feed/FeedColumn'
 
 function FeedIndex() {
-  return <div>General Feed (coming soon)</div>
+  return <FeedColumn />
 }
 
 export const Route = createFileRoute('/feed/')({

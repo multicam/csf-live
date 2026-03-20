@@ -1,7 +1,8 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useDarkMode } from '@/hooks/useDarkMode'
+import { StatusBar } from '@/components/shared/StatusBar'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,17 +13,15 @@ const queryClient = new QueryClient({
 })
 
 function RootLayout() {
-  useEffect(() => {
-    const stored = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    if (stored === 'dark' || (!stored && prefersDark)) {
-      document.documentElement.classList.add('dark')
-    }
-  }, [])
+  // useDarkMode handles theme init and persistence
+  useDarkMode()
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="relative min-h-screen bg-warm-50 text-warm-900 dark:bg-warm-950 dark:text-warm-50">
+        <Outlet />
+        <StatusBar />
+      </div>
       {import.meta.env.DEV && <TanStackRouterDevtools />}
     </QueryClientProvider>
   )

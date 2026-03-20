@@ -1,11 +1,8 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { FeedShell } from '@/components/feed/FeedShell'
 
 function FeedLayout() {
-  return (
-    <div className="flex h-screen overflow-hidden">
-      <Outlet />
-    </div>
-  )
+  return <FeedShell />
 }
 
 export const Route = createFileRoute('/feed/_layout')({
