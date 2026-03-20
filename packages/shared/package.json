@@ -1,0 +1,10 @@
+{
+  "name": "@csf-live/shared",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./types.ts",
+  "types": "./types.ts",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
