@@ -23,6 +23,8 @@
 
 No code exists. `packages/` directory does not exist. `specs/scenarios/` does not exist. TIER=1 confirmed.
 
+**Last verified**: 2026-03-21. All tasks in §1–3 remain unimplemented. Build Sequence §7 Phase A is the starting point.
+
 ### Iteration 1 Gap Analysis (2026-03-21)
 
 Cross-referencing specs against plan found these corrections:
@@ -54,6 +56,8 @@ Items explicitly excluded from Tier 1 (not planned here):
 - PWA service worker, push notifications, share target
 - Diff view for document versions (read-only list only)
 - Split / Merge content operations
+- Spawn project from selected feed items (projects.md §Creating a Project — "user selects one or more feed items")
+- Soft-delete recovery UI (content items have `deletedAt`; recovery is Tier 2+)
 - Third-party collaborator access model
 
 ---
@@ -480,7 +484,7 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 - `ProjectFeed.tsx`:
   - `useProjectFeedItems(projectId, sectionId?)` — messages + content items merged, sorted newest-at-top
   - `<SectionChips>` row above feed — "All" + section chips; clicking pushes `?section=:id`
-  - Project root view: all sections' content interleaved, section-message badge labels
+  - Project root view: read aggregate (not a separate thread) — interleaves project discussion messages + all section messages; section messages labeled with their section name (e.g., "In Frontend Architecture: [message]")
   - Empty state: "Add a section or drop content here to get started."
 - `SectionChips.tsx` — horizontal scrollable row; active chip highlighted
 
@@ -615,6 +619,7 @@ Clicking a feed item navigates to correct detail route via TanStack Router `navi
 **Source**: `notifications.md`
 
 - `NotificationPanel.tsx` — Radix Dialog from App Menu "Notifications":
+  - Unread badges: project cards in Projects column + section headers in project feed
   - List from `useNotifications()` sorted DESC
   - Each: title (bold if unread), body, timestamp, type icon
   - Click → `useMarkNotificationRead(id)` + navigate to referenced content
