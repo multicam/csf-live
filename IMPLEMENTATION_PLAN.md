@@ -21,13 +21,15 @@
 
 ### Greenfield State
 
-**Last verified**: 2026-03-21. Phases A–E are complete. Build Sequence §7 Phase F is the starting point.
+**Last verified**: 2026-03-21. Phases A–F (Tasks 1.1–3.21) are complete.
 
 Phases A and B (Tasks 1.1–2.5) are fully implemented: monorepo, deps, types, router, Biome, Tailwind, Vitest, mock data, Zustand store, mock API, Minisearch, React Query hooks.
 
 Phase C (Tasks 3.1–3.5) is fully implemented: root layout/app shell, canvas scratchpad, 3-column feed shell, projects column, general feed.
 
 Phases D+E (Tasks 3.6–3.12) are fully implemented — see notes on each task below.
+
+Phase F (Tasks 3.13–3.21) is fully implemented: Timeline mode (sort toggle, filter bar, filter chips, localStorage persistence), Categorized mode (CategorizedFeed.tsx, group-by dropdown, collapse persistence, 200ms crossfade), Search UI (SearchColumn.tsx, SearchResults.tsx, /search route, URL params, Cmd+Shift+F), Content Fluidity (MoveItemDialog, context menu, HTML5 DnD, optimistic move/copy/unassign), Notification Panel (Radix Dialog, navigate by referenceType, unread badges), Presence Indicators (ProjectDashboard + ProjectsColumn + AppMenu Who's Online), Responsive Layouts (MobileTabBar.tsx, 4-tab nav), Dark Mode (useDarkMode hook, dark: variants, tests), Smooth Transitions (ToastProvider.tsx, route pending top bar, fade-in animations).
 
 **Routing architecture note:** All feed routes render `FeedShell` directly (passing col2/col3 as props) rather than using `_layout.tsx` nested layouts. TanStack Router's flat `routeTree.gen.ts` generation did not work with the nested `_layout.tsx` approach, so each route file at `feed/index.tsx`, `feed/$slug/index.tsx`, etc. renders the 3-column shell directly.
 
@@ -574,7 +576,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
   - `<VersionHistoryPanel>` reused; "Restore" disabled in Tier 1
   - Column must have `overflow: hidden` to contain tldraw
 
-### Task 3.13 — Timeline Mode (Feed Column)
+### Task 3.13 — Timeline Mode (Feed Column) ✓ DONE
 **Source**: `views.md` §Mode 1
 
 - Timeline is the default mode; mode switcher tabs in FeedColumn header: Timeline | Categorized | Search (Radix `<Tabs>`)
@@ -590,7 +592,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
 
 **Tests:** Type filter removes non-matching; author filter; date range filter
 
-### Task 3.14 — Categorized Mode (Feed Column)
+### Task 3.14 — Categorized Mode (Feed Column) ✓ DONE
 **Source**: `views.md` §Mode 2
 
 - `CategorizedFeed.tsx`:
@@ -604,7 +606,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
 
 **Tests:** Grouping produces correct groups; counts match; collapse toggling
 
-### Task 3.15 — Search UI
+### Task 3.15 — Search UI ✓ DONE
 **Source**: `search.md`, `views.md` §Mode 3
 
 - `routes/search.tsx` — same 3-column shell; Feed column shows `<SearchResults>`
@@ -618,7 +620,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
 
 **Tests:** `searchItems('auth')` returns correct results; type filter narrows; empty query returns empty array
 
-### Task 3.16 — Content Fluidity (Move / Copy / Drag-and-Drop)
+### Task 3.16 — Content Fluidity (Move / Copy / Drag-and-Drop) ✓ DONE
 **Source**: `content.md` §Content Fluidity
 
 - "Move to..." via content card context menu → Radix Dialog with project + section picker → `useMoveContentItem()` → optimistic UI removes item immediately
@@ -633,7 +635,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
 
 **Tests:** `moveContentItem` removes from source, adds to target; `copyContentItem` leaves original in place
 
-### Task 3.17 — Notification Panel
+### Task 3.17 — Notification Panel ✓ DONE
 **Source**: `notifications.md`
 
 - `NotificationPanel.tsx` — Radix Dialog from App Menu "Notifications":
@@ -648,7 +650,7 @@ Implemented: `DrawingEditor.tsx` with embedded tldraw, 3s auto-save to localStor
 
 **Tests:** Unread count correct; marking one read decrements; mark all sets count to 0; navigation URL derived from referenceType/referenceId
 
-### Task 3.18 — Presence Indicators
+### Task 3.18 — Presence Indicators ✓ DONE
 **Source**: `notifications.md` §Presence
 
 Static presence — no WebSocket in Tier 1:
@@ -659,7 +661,7 @@ Static presence — no WebSocket in Tier 1:
 
 **Tests:** Indicator shows for Ben in correct project; absent elsewhere
 
-### Task 3.19 — Responsive Layouts
+### Task 3.19 — Responsive Layouts ✓ DONE
 **Source**: `layout.md` §Responsive Behavior
 
 - Mobile (`<768px`): `<MobileTabBar />` fixed at bottom (Canvas, Projects, Feed, Detail tabs)
@@ -673,7 +675,7 @@ Static presence — no WebSocket in Tier 1:
 
 **Tests:** `useBreakpoint` returns `mobile` at 375px, `tablet` at 800px, `desktop` at 1200px
 
-### Task 3.20 — Dark Mode
+### Task 3.20 — Dark Mode ✓ DONE
 **Source**: `design.md`
 
 - `useDarkMode()` hook: reads `localStorage`, detects system preference, toggles `dark` class on `documentElement`; cycles `light → dark → system`
@@ -683,7 +685,7 @@ Static presence — no WebSocket in Tier 1:
 
 **Tests:** `useDarkMode` applies `dark` class correctly; respects system preference when null
 
-### Task 3.21 — Smooth Transitions
+### Task 3.21 — Smooth Transitions ✓ DONE
 **Source**: `design.md` §Interaction Quality
 
 - Mode switch (Timeline/Categorized/Search): 200-300ms opacity crossfade

@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "react-grab-mcp": {
-      "command": "react-grab",
+      "command": "./packages/web/node_modules/.bin/react-grab",
       "args": ["mcp"]
     },
     "brave-devtools": {
