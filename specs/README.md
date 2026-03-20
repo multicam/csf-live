@@ -34,12 +34,13 @@ CSF Live is a private, collaborative AI workspace where a small team captures id
 | [techstack-study.md](techstack-study.md) | Tech stack decisions, architecture, all alternatives evaluated |
 | [data-model.md](data-model.md) | Database schema, tables, indexes, full-text search |
 | [claude-integration.md](claude-integration.md) | Claude in production (API, CLI, SDK), development integration, context assembly, streaming, agents |
+| [sdd.md](sdd.md) | Scenario-Driven Development methodology, Gherkin formalism, devtools-mcp + react-grab workflow |
 
 ### Planning
 
 | Document | Covers |
 |----------|--------|
-| [phasing.md](phasing.md) | 6-phase build plan with spec file references per phase |
+| [phasing.md](phasing.md) | 3-tier build plan with spec file references per phase |
 
 ---
 

@@ -543,6 +543,7 @@ No timeouts to worry about. The persistent server process is the core advantage 
 | **Markdown rendering** | react-markdown + remark plugins | Rendering document content |
 | **Mermaid diagrams** | mermaid.js | Structured diagrams Claude can generate |
 | **Icons** | Lucide React | Clean, consistent, open-source |
+| **Dev tools** | react-grab | Element → component name + file path + HTML. AI-assisted development context. Dev-only. |
 
 ### State Management Strategy
 
@@ -582,7 +583,7 @@ If the app grows or needs more control, migrating to AWS ECS/Fargate is straight
 
 ```
 git push → GitHub Actions CI
-  → Run tests (Vitest + Playwright)
+  → Run tests (Vitest)
   → Lint (Biome)
   → Build frontend (Vite) → Deploy to Vercel/CF Pages
   → Build API (Bun) → Deploy to Railway/Fly.io
@@ -605,10 +606,66 @@ git push → GitHub Actions CI
 | **Monorepo** | Bun workspaces | Frontend + API in one repo, shared types |
 | **Code quality** | Biome | Linting + formatting, replaces ESLint + Prettier |
 | **Testing (unit)** | Vitest | Fast, TypeScript-native |
-| **Testing (E2E)** | Playwright | Cross-browser, reliable |
+| **Testing (browser)** | devtools-mcp (Brave/Chrome DevTools Protocol) | Browser automation via MCP — Claude Code drives the browser directly. Replaces Playwright for E2E and SDD scenario validation. |
+| **Testing (component context)** | react-grab | Point at any UI element → copies component name, file path, HTML. Gives Claude Code precise component context during development and SDD validation. Dev-only. |
 | **Testing (API)** | Vitest + supertest | API route testing |
+| **SDD methodology** | Scenario-Driven Development | Scenarios written per feature → validated by Claude Code via devtools-mcp → Vitest unit tests written after scenarios pass. See [SDD approach](#sdd-approach) below. |
 | **CI/CD** | GitHub Actions | Free for the repo size |
 | **Version control** | Git + GitHub | Standard |
+
+### SDD Approach
+
+Scenario-Driven Development replaces traditional TDD/BDD for CSF Live. The workflow:
+
+```
+1. Write scenario (Gherkin-style in .feature or markdown)
+     ↓
+2. Claude Code reads scenario
+     ↓
+3. Claude Code implements the feature
+     ↓
+4. Claude Code validates via devtools-mcp:
+   - Launches Brave browser
+   - Navigates to the app
+   - Performs the scenario steps (click, type, navigate)
+   - Uses react-grab to inspect component state and structure
+   - Verifies expected outcomes (element visible, data correct, state changed)
+     ↓
+5. Scenario passes → write Vitest unit tests for the underlying logic
+     ↓
+6. CI runs Vitest tests on every push
+```
+
+**Key difference from Playwright-based SDD:** No separate test runner for E2E. Claude Code IS the test runner — it drives the browser via devtools-mcp during development and validates scenarios interactively. Vitest covers unit/integration for CI.
+
+**react-grab in the loop:** When Claude Code is validating a scenario and needs to understand a UI element, react-grab provides:
+- Exact component name and file path
+- Current HTML structure
+- Component hierarchy context
+
+This closes the loop between "what's on screen" and "where's the code" — Claude Code can inspect, identify, and fix in one pass.
+
+**Scenario file structure:**
+```
+specs/scenarios/
+├── feed/
+│   ├── posting.feature          # Feed message posting scenarios
+│   ├── quick-capture.feature    # Quick capture scenarios
+│   └── content-movement.feature # Move/copy content scenarios
+├── projects/
+│   ├── creation.feature
+│   ├── sections.feature
+│   └── dashboard.feature
+├── canvas/
+│   ├── drawing.feature
+│   └── versioning.feature
+├── discussions/
+│   └── messaging.feature
+├── search/
+│   └── search.feature
+└── notifications/
+    └── presence.feature
+```
 
 ### Project Structure
 
