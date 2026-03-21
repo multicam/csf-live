@@ -31,6 +31,8 @@ Phases D+E (Tasks 3.6–3.12) are fully implemented — see notes on each task b
 
 Phase F (Tasks 3.13–3.21) is fully implemented: Timeline mode (sort toggle, filter bar, filter chips, localStorage persistence), Categorized mode (CategorizedFeed.tsx, group-by dropdown, collapse persistence, 200ms crossfade), Search UI (SearchColumn.tsx, SearchResults.tsx, /search route, URL params, Cmd+Shift+F), Content Fluidity (MoveItemDialog, context menu, HTML5 DnD, optimistic move/copy/unassign), Notification Panel (Radix Dialog, navigate by referenceType, unread badges), Presence Indicators (ProjectDashboard + ProjectsColumn + AppMenu Who's Online), Responsive Layouts (MobileTabBar.tsx, 4-tab nav), Dark Mode (useDarkMode hook, dark: variants, tests), Smooth Transitions (ToastProvider.tsx, route pending top bar, fade-in animations).
 
+**Post-plan additions (2026-03-21):** Keyboard shortcuts (Cmd+K app menu, Cmd+N compose, Cmd+Shift+F search — AppMenu.tsx controlled DropdownMenu + KeyboardShortcutsDialog); `specs/scenarios/layout/keyboard-shortcuts.feature` (6 scenarios); Canvas custom shape utils (`ProjectNodeShapeUtil`, `FeedNodeShapeUtil` with tldraw v4 `TLGlobalShapePropsMap` augmentation, node sync via `editorMounted` flag + `useCallback`).
+
 **Routing architecture note:** All feed routes render `FeedShell` directly (passing col2/col3 as props) rather than using `_layout.tsx` nested layouts. TanStack Router's flat `routeTree.gen.ts` generation did not work with the nested `_layout.tsx` approach, so each route file at `feed/index.tsx`, `feed/$slug/index.tsx`, etc. renders the 3-column shell directly.
 
 ### Iteration 1 Gap Analysis (2026-03-21)
