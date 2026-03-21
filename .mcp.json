@@ -1,10 +1,6 @@
 {
   "mcpServers": {
-    "react-grab-mcp": {
-      "command": "./packages/web/node_modules/.bin/react-grab",
-      "args": ["mcp"]
-    },
-    "brave-devtools": {
+"brave-devtools": {
       "command": "chrome-devtools-mcp",
       "args": [
         "--executablePath",
