@@ -55,6 +55,9 @@ function VersionHistoryPanel({ itemId, onClose }: { itemId: string; onClose: () 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl border border-warm-200 bg-white p-0 shadow-xl dark:border-warm-700 dark:bg-warm-900 max-h-[80vh] flex flex-col">
+          <Dialog.Description className="sr-only">
+            List of document versions. Click to preview. Restore is available in Phase 2.
+          </Dialog.Description>
           <div className="flex items-center justify-between border-b border-warm-200 dark:border-warm-800 px-4 py-3">
             <Dialog.Title className="text-sm font-semibold text-warm-900 dark:text-warm-100">
               Version History

@@ -109,6 +109,9 @@ export function MoveItemDialog({ itemId, mode, onClose }: MoveItemDialogProps) {
           )}
           onEscapeKeyDown={onClose}
         >
+          <Dialog.Description className="sr-only">
+            Select a target project and optional section to move or copy this item.
+          </Dialog.Description>
           <div className="mb-4 flex items-center justify-between">
             <Dialog.Title className="text-base font-semibold text-warm-900 dark:text-warm-100">
               {title}

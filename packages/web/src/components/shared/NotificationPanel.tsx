@@ -152,6 +152,9 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
           )}
           onEscapeKeyDown={onClose}
         >
+          <Dialog.Description className="sr-only">
+            Your recent notifications. Click any notification to navigate to the referenced content.
+          </Dialog.Description>
           {/* Header */}
           <div className="flex flex-shrink-0 items-center justify-between border-b border-warm-200 px-4 py-3 dark:border-warm-700">
             <Dialog.Title className="text-base font-semibold text-warm-900 dark:text-warm-100">

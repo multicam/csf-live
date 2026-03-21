@@ -41,6 +41,9 @@ export function CreateProjectDialog({ onClose }: CreateProjectDialogProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-xl border border-warm-200 bg-white p-6 shadow-xl dark:border-warm-700 dark:bg-warm-900">
+          <Dialog.Description className="sr-only">
+            Enter a project title and optional description to create a new project.
+          </Dialog.Description>
           <div className="flex items-center justify-between mb-4">
             <Dialog.Title className="text-base font-semibold text-warm-900 dark:text-warm-100">
               New Project
