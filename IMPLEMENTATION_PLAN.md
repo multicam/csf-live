@@ -33,6 +33,8 @@ Phase F (Tasks 3.13–3.21) is fully implemented: Timeline mode (sort toggle, fi
 
 **Post-plan additions (2026-03-21):** Keyboard shortcuts (Cmd+K app menu, Cmd+N compose, Cmd+Shift+F search — AppMenu.tsx controlled DropdownMenu + KeyboardShortcutsDialog); `specs/scenarios/layout/keyboard-shortcuts.feature` (6 scenarios); Canvas custom shape utils (`ProjectNodeShapeUtil`, `FeedNodeShapeUtil` with tldraw v4 `TLGlobalShapePropsMap` augmentation, node sync via `editorMounted` flag + `useCallback`).
 
+**Post-plan additions (Iteration 4, 2026-03-21):** Voice/photo/file capture implemented in ComposeInput (MediaRecorder hold-to-record → voice content item; hidden file inputs for photo/file); DialogDescription added to all 6 Radix DialogContent components (MoveItemDialog, CreateProjectDialog, CreateSectionDialog, NotificationPanel, DocumentEditor VersionHistoryPanel, AppMenu KeyboardShortcutsDialog); react-grab 404 fixed by removing non-module script tag from index.html.
+
 **Routing architecture note:** All feed routes render `FeedShell` directly (passing col2/col3 as props) rather than using `_layout.tsx` nested layouts. TanStack Router's flat `routeTree.gen.ts` generation did not work with the nested `_layout.tsx` approach, so each route file at `feed/index.tsx`, `feed/$slug/index.tsx`, etc. renders the 3-column shell directly.
 
 ### Iteration 1 Gap Analysis (2026-03-21)
@@ -978,7 +980,7 @@ All AI features are Phase 3. In Tier 1, `user-claude` exists in mock data with p
 23. Task 3.11 Document editor (TipTap) ✓
 24. Task 3.12 Drawing editor (tldraw in Detail) ✓
 
-**Phase F — Views + search:** ← CURRENT STARTING POINT
+**Phase F — Views + search:** ✓ COMPLETE
 25. Task 3.13 Timeline mode
 26. Task 3.14 Categorized mode
 27. Task 3.15 Search UI
