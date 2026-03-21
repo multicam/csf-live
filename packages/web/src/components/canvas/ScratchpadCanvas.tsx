@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Tldraw, type Editor } from 'tldraw'
+import { Tldraw, type Editor, createShapeId } from 'tldraw'
 import 'tldraw/tldraw.css'
 import { useNavigate } from '@tanstack/react-router'
 import { useScratchpadCanvas, useSaveCanvas, useSaveAndCloseCanvas } from '@/hooks/useCanvas'
@@ -7,6 +7,11 @@ import { useProjects } from '@/hooks/useProjects'
 import { useDarkMode } from '@/hooks/useDarkMode'
 import { Save, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ProjectNodeShapeUtil } from './ProjectNodeShapeUtil'
+import { FeedNodeShapeUtil } from './FeedNodeShapeUtil'
+import type { TLProjectNodeShape } from './ProjectNodeShapeUtil'
+
+const CUSTOM_SHAPE_UTILS = [ProjectNodeShapeUtil, FeedNodeShapeUtil]
 
 const DRAFT_KEY = 'csf-live:canvas-draft'
 const DRAFT_TS_KEY = 'csf-live:canvas-draft-ts'
@@ -53,6 +58,8 @@ export function ScratchpadCanvas() {
   const [draftDoc, setDraftDoc] = useState<unknown>(null)
   const [targetProjectId, setTargetProjectId] = useState<string | null>(null)
   const [showSaveMenu, setShowSaveMenu] = useState(false)
+  // Tracks when the editor has mounted so the project-sync effect can re-run
+  const [editorMounted, setEditorMounted] = useState(false)
 
   // Check for a recoverable draft on mount
   useEffect(() => {
@@ -73,6 +80,67 @@ export function ScratchpadCanvas() {
       }
     }
   }, [])
+
+  // Sync project/feed nodes into the canvas. Called as a useEffect and also
+  // imperatively after loadSnapshot (which would otherwise wipe the nodes).
+  const syncProjectNodes = useCallback(
+    (editor: Editor) => {
+      if (projects.length === 0) return
+      const shapes = editor.getCurrentPageShapes()
+      let addedAny = false
+
+      // Add Feed node if missing
+      const hasFeedNode = shapes.some(s => s.type === 'feed-node')
+      if (!hasFeedNode) {
+        editor.createShape({
+          id: createShapeId('feed-node'),
+          type: 'feed-node',
+          x: 40,
+          y: 40,
+          props: { w: 140, h: 48 },
+        })
+        addedAny = true
+      }
+
+      // Add project nodes for any missing projects
+      const existingProjectNodeIds = shapes
+        .filter(s => s.type === 'project-node')
+        .map(s => (s as TLProjectNodeShape).props.projectId)
+
+      projects.forEach((project, index) => {
+        if (existingProjectNodeIds.includes(project.id)) return
+        editor.createShape({
+          id: createShapeId('project-node-' + project.id),
+          type: 'project-node',
+          x: 40,
+          y: 100 + index * 62,
+          props: {
+            projectId: project.id,
+            title: project.title,
+            slug: project.slug,
+            status: project.status,
+            unreadCount: 0,
+            w: 180,
+            h: 52,
+          },
+        })
+        addedAny = true
+      })
+
+      // Zoom to fit after placing nodes for the first time on a fresh canvas
+      if (addedAny) {
+        editor.zoomToFit({ animation: { duration: 0 } })
+      }
+    },
+    [projects]
+  )
+
+  // Sync nodes when both editor and projects are ready.
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor || projects.length === 0) return
+    syncProjectNodes(editor)
+  }, [projects, editorMounted, syncProjectNodes])
 
   const handleEditorMount = useCallback(
     (editor: Editor) => {
@@ -104,6 +172,9 @@ export function ScratchpadCanvas() {
         }, SAVE_DEBOUNCE_MS)
       })
 
+      // Signal that the editor is ready — triggers the project-sync effect
+      setEditorMounted(true)
+
       return unsub
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,30 +183,32 @@ export function ScratchpadCanvas() {
 
   function acceptDraft() {
     setShowDraftBanner(false)
-    if (draftDoc && editorRef.current) {
+    const editor = editorRef.current
+    if (!editor) return
+    if (draftDoc) {
       try {
-        editorRef.current.loadSnapshot(
-          draftDoc as Parameters<typeof editorRef.current.loadSnapshot>[0]
-        )
+        editor.loadSnapshot(draftDoc as Parameters<typeof editor.loadSnapshot>[0])
       } catch {
         // ignore
       }
     }
+    syncProjectNodes(editor)
   }
 
   function dismissDraft() {
     setShowDraftBanner(false)
     localStorage.removeItem(DRAFT_KEY)
     localStorage.removeItem(DRAFT_TS_KEY)
-    if (savedDoc && editorRef.current) {
+    const editor = editorRef.current
+    if (!editor) return
+    if (savedDoc) {
       try {
-        editorRef.current.loadSnapshot(
-          savedDoc as Parameters<typeof editorRef.current.loadSnapshot>[0]
-        )
+        editor.loadSnapshot(savedDoc as Parameters<typeof editor.loadSnapshot>[0])
       } catch {
         // ignore
       }
     }
+    syncProjectNodes(editor)
   }
 
   async function handleSave() {
@@ -218,7 +291,7 @@ export function ScratchpadCanvas() {
         </button>
       </div>
 
-      <Tldraw onMount={handleEditorMount} />
+      <Tldraw shapeUtils={CUSTOM_SHAPE_UTILS} onMount={handleEditorMount} />
     </div>
   )
 }
