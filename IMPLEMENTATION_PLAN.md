@@ -25,7 +25,7 @@
 
 Phases A and B (Tasks 1.1–2.5) are fully implemented: monorepo, deps, types, router, Biome, Tailwind, Vitest, mock data, Zustand store, mock API, Minisearch, React Query hooks.
 
-Phase C (Tasks 3.1–3.5) is fully implemented: root layout/app shell, canvas scratchpad, 3-column feed shell, projects column, general feed.
+Phase C (Tasks 3.1–3.5) is fully implemented: root layout/app shell, canvas scratchpad (including `ProjectNodeShapeUtil` and `FeedNodeShapeUtil` as custom tldraw ShapeUtils in `packages/web/src/components/canvas/`; nodes synced on editor mount and after `loadSnapshot` calls; canvas scenarios 2/3/4 passing), 3-column feed shell, projects column, general feed.
 
 Phases D+E (Tasks 3.6–3.12) are fully implemented — see notes on each task below.
 
@@ -375,7 +375,7 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 - Dark mode toggle: reads/writes `localStorage`, applies `dark` class to `documentElement`, respects `prefers-color-scheme` as default
 - Keyboard shortcut global handler: `Cmd+K` App Menu, `Cmd+N` Quick Capture, `Cmd+1/2/3` columns, `Cmd+\` Projects toggle, `Escape` close overlays
 
-### Task 3.2 — Canvas Scratchpad Route (`/`)
+### Task 3.2 — Canvas Scratchpad Route (`/`) ✓ DONE
 **Source**: `canvas.md` §App-Level Scratchpad, `layout.md` §Mode 1
 
 - `routes/index.tsx` — full-screen layout, renders `<ScratchpadCanvas />`
@@ -386,8 +386,14 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
   - Auto-save to `localStorage` after 3s inactivity (debounced `onChange`)
   - Save button → canvas targeting picker (Feed default or project dropdown) → `useSaveCanvas()`
   - Save and Close button → `useSaveAndCloseCanvas()` → wipes canvas to blank
-- `ProjectNode.tsx` — custom tldraw `ShapeUtil`: project title, status dot, unread badge; click → navigate `/feed/:slug`
-- `FeedNode.tsx` — custom tldraw shape: "Feed" label; click → navigate `/feed`
+- `ProjectNode.tsx` — implemented as `ProjectNodeShapeUtil` (custom tldraw `ShapeUtil`): project title, status dot, unread badge; click → navigate `/feed/:slug`
+- `FeedNode.tsx` — implemented as `FeedNodeShapeUtil` (custom tldraw `ShapeUtil`): "Feed" label; click → navigate `/feed`
+
+**Implementation notes:**
+- `ProjectNodeShapeUtil` and `FeedNodeShapeUtil` live in `packages/web/src/components/canvas/`
+- Both shape types are registered via the `shapeUtils` prop on `<Tldraw>`
+- Project and feed nodes are synced onto the editor on mount and re-synced after every `loadSnapshot()` call (snapshot restore wipes editor state, so node sync must follow)
+- Required installing `@tldraw/tlschema` as a dev dependency and adding a `tsconfig` path alias for the `TLGlobalShapePropsMap` module augmentation that registers custom shape types with tldraw's type system
 
 **Tier 1 constraints:** No real-time collaboration, no per-user spatial state.
 
@@ -395,6 +401,9 @@ Features are ordered by dependency. Each task: write `.feature` file → impleme
 - Draft recovery: newer localStorage draft triggers banner; older draft does not
 - `saveCanvas` creates drawing content item with correct fields
 - `saveAndCloseCanvas` resets scratchpad state
+- Canvas scenario 2 (project nodes visible on canvas) — passing
+- Canvas scenario 3 (clicking a project node navigates to `/feed/:slug`) — passing
+- Canvas scenario 4 (clicking feed node navigates to `/feed`) — passing
 
 ### Task 3.3 — Feed Layout (3-Column Shell)
 **Source**: `layout.md` §Mode 2
