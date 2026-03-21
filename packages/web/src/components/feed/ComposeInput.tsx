@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Plus, Send, Mic, Camera, Paperclip } from 'lucide-react'
 import { usePostMessage } from '@/hooks/useFeed'
 import { useCreateContentItem } from '@/hooks/useContentItem'
@@ -27,6 +27,18 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const postMessage = usePostMessage()
   const createContentItem = useCreateContentItem()
+
+  useEffect(() => {
+    function handleGlobalKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'n') {
+        e.preventDefault()
+        setMode('enhanced')
+        setTimeout(() => textareaRef.current?.focus(), 0)
+      }
+    }
+    window.addEventListener('keydown', handleGlobalKeyDown)
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown)
+  }, [])
 
   const handleSubmit = useCallback(async () => {
     const trimmed = text.trim()
