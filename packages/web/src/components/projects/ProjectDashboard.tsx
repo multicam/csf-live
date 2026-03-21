@@ -258,7 +258,7 @@ export function ProjectDashboard({ slug }: ProjectDashboardProps) {
                     {CONTENT_TYPE_LABELS[item.type] ?? item.type}
                   </span>
                   <span className="truncate flex-1 text-warm-800 dark:text-warm-200">
-                    {item.title ?? 'Untitled'}
+                    {item.title ?? (item.metadata as Record<string, unknown>)?.title as string ?? 'Untitled'}
                   </span>
                   <span className="flex-shrink-0 text-warm-400 dark:text-warm-500">
                     {author?.name ?? '?'} · {formatDistanceToNow(new Date(item.createdAt))}
