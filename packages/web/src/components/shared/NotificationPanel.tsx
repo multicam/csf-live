@@ -1,8 +1,8 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useNavigate } from '@tanstack/react-router'
 import { X, MessageSquare, Plus, Search, Bell } from 'lucide-react'
 import { useNotifications, useMarkNotificationRead, useMarkAllRead } from '@/hooks/useNotifications'
 import { useMockStore } from '@/mocks/store'
+import { countUnreadNotifications, getNotificationUrl, sortNotificationsByNewest } from '@/lib/notifications'
 import { formatDistanceToNow } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import type { Notification } from '@csf-live/shared'
@@ -27,37 +27,6 @@ function notificationIcon(type: string) {
   }
 }
 
-function useNotificationUrl(notification: Notification): string {
-  const { projects, sections, contentItems } = useMockStore()
-
-  const { referenceType, referenceId } = notification
-
-  if (referenceType === 'project') {
-    const project = projects.find(p => p.id === referenceId)
-    return project ? `/feed/${project.slug}` : '/feed'
-  }
-
-  if (referenceType === 'section') {
-    const section = sections.find(s => s.id === referenceId)
-    if (!section) return '/feed'
-    const project = projects.find(p => p.id === section.projectId)
-    return project ? `/feed/${project.slug}?section=${referenceId}` : '/feed'
-  }
-
-  if (referenceType === 'content_item') {
-    const item = contentItems.find(ci => ci.id === referenceId)
-    if (!item) return '/feed'
-    if (item.projectId) {
-      const project = projects.find(p => p.id === item.projectId)
-      return project ? `/feed/${project.slug}/item/${referenceId}` : '/feed'
-    }
-    return '/feed'
-  }
-
-  // 'message' or unknown
-  return '/feed'
-}
-
 function NotificationRow({
   notification,
   onClose,
@@ -65,9 +34,9 @@ function NotificationRow({
   notification: Notification
   onClose: () => void
 }) {
-  const navigate = useNavigate()
   const markRead = useMarkNotificationRead()
-  const url = useNotificationUrl(notification)
+  const { projects, sections, contentItems } = useMockStore()
+  const url = getNotificationUrl(notification, { projects, sections, contentItems })
   const Icon = notificationIcon(notification.type)
 
   function handleClick() {
@@ -75,15 +44,12 @@ function NotificationRow({
       markRead.mutate(notification.id)
     }
     onClose()
-    // Navigate to the referenced content
-    // url may contain query params; use window.location as a simple approach
-    // Since TanStack Router navigate doesn't accept raw strings, use window.history
-    window.location.href = url
-    void navigate
+    window.location.assign(url)
   }
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       className={cn(
         'w-full text-left rounded-lg p-3 transition-colors',
@@ -134,11 +100,8 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
   const { data: notifications = [] } = useNotifications()
   const markAllRead = useMarkAllRead()
 
-  const sorted = [...notifications].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
-
-  const unreadCount = notifications.filter(n => !n.read).length
+  const sorted = sortNotificationsByNewest(notifications)
+  const unreadCount = countUnreadNotifications(notifications)
 
   return (
     <Dialog.Root open={open} onOpenChange={isOpen => { if (!isOpen) onClose() }}>
@@ -169,6 +132,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
                 <button
+                  type="button"
                   onClick={() => markAllRead.mutate()}
                   disabled={markAllRead.isPending}
                   className="text-xs font-medium text-warm-500 hover:text-warm-700 dark:text-warm-400 dark:hover:text-warm-200 transition-colors disabled:opacity-50"
@@ -177,6 +141,7 @@ export function NotificationPanel({ open, onClose }: NotificationPanelProps) {
                 </button>
               )}
               <button
+                type="button"
                 onClick={onClose}
                 className="flex h-7 w-7 items-center justify-center rounded-md text-warm-400 hover:bg-warm-100 hover:text-warm-700 dark:hover:bg-warm-800 dark:hover:text-warm-300 transition-colors"
                 aria-label="Close notifications"

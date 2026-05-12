@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import path from 'path'
+import path from 'node:path'
 
 export default defineConfig({
   plugins: [react()],
@@ -10,10 +10,16 @@ export default defineConfig({
     globals: true,
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@csf-live/shared': path.resolve(__dirname, '../shared/types.ts'),
-      '@csf-live/shared/constants': path.resolve(__dirname, '../shared/constants.ts'),
-    },
+    alias: [
+      {
+        find: '@csf-live/shared/constants',
+        replacement: path.resolve(__dirname, '../shared/constants.ts'),
+      },
+      {
+        find: '@csf-live/shared',
+        replacement: path.resolve(__dirname, '../shared/types.ts'),
+      },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
 })

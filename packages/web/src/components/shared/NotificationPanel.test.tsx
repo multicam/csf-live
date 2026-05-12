@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import type { Notification, Project, Section, ContentItem } from '@csf-live/shared'
+import { countUnreadNotifications, getNotificationUrl, sortNotificationsByNewest } from '@/lib/notifications'
 
 // ─── Pure logic tests for notification panel behaviour ───────────────────────
 // Tests cover: unread count decrement, mark-all-read, and URL derivation.
@@ -31,39 +32,6 @@ function markRead(notifications: Notification[], id: string): Notification[] {
 
 function markAllRead(notifications: Notification[]): Notification[] {
   return notifications.map(n => ({ ...n, read: true }))
-}
-
-// URL derivation logic (mirrors NotificationPanel.tsx / useNotificationUrl)
-function deriveUrl(
-  referenceType: string,
-  referenceId: string,
-  projects: Pick<Project, 'id' | 'slug'>[],
-  sections: Pick<Section, 'id' | 'projectId'>[],
-  contentItems: Pick<ContentItem, 'id' | 'projectId'>[]
-): string {
-  if (referenceType === 'project') {
-    const project = projects.find(p => p.id === referenceId)
-    return project ? `/feed/${project.slug}` : '/feed'
-  }
-
-  if (referenceType === 'section') {
-    const section = sections.find(s => s.id === referenceId)
-    if (!section) return '/feed'
-    const project = projects.find(p => p.id === section.projectId)
-    return project ? `/feed/${project.slug}?section=${referenceId}` : '/feed'
-  }
-
-  if (referenceType === 'content_item') {
-    const item = contentItems.find(ci => ci.id === referenceId)
-    if (!item) return '/feed'
-    if (item.projectId) {
-      const project = projects.find(p => p.id === item.projectId)
-      return project ? `/feed/${project.slug}/item/${referenceId}` : '/feed'
-    }
-    return '/feed'
-  }
-
-  return '/feed'
 }
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -99,6 +67,7 @@ beforeEach(() => {
 describe('unread count — decrements after marking one notification read', () => {
   it('starts at 2 unread', () => {
     expect(unreadCount(notifications)).toBe(2)
+    expect(countUnreadNotifications(notifications)).toBe(2)
   })
 
   it('decrements by 1 after marking one unread notification as read', () => {
@@ -117,6 +86,21 @@ describe('unread count — decrements after marking one notification read', () =
     expect(unreadCount(state)).toBe(1)
     state = markRead(state, 'n2')
     expect(unreadCount(state)).toBe(0)
+  })
+})
+
+describe('sortNotificationsByNewest', () => {
+  it('sorts newest notifications first without mutating the original array', () => {
+    const datedNotifications = [
+      makeNotification({ id: 'n-oldest', createdAt: new Date('2026-03-01T12:00:00Z') }),
+      makeNotification({ id: 'n-newest', createdAt: new Date('2026-03-03T12:00:00Z') }),
+      makeNotification({ id: 'n-middle', createdAt: new Date('2026-03-02T12:00:00Z') }),
+    ]
+
+    const sorted = sortNotificationsByNewest(datedNotifications)
+
+    expect(sorted.map(notification => notification.id)).toEqual(['n-newest', 'n-middle', 'n-oldest'])
+    expect(datedNotifications.map(notification => notification.id)).toEqual(['n-oldest', 'n-newest', 'n-middle'])
   })
 })
 
@@ -144,47 +128,74 @@ describe('markAllRead — sets count to 0', () => {
 
 describe('notification navigation URL derivation', () => {
   it('project referenceType → /feed/:slug', () => {
-    const url = deriveUrl('project', 'project-csf-live', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'project', referenceId: 'project-csf-live' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed/csf-live')
   })
 
   it('unknown project id → /feed', () => {
-    const url = deriveUrl('project', 'project-unknown', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'project', referenceId: 'project-unknown' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 
   it('section referenceType → /feed/:slug?section=:id', () => {
-    const url = deriveUrl('section', 'section-csf-fe', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'section', referenceId: 'section-csf-fe' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed/csf-live?section=section-csf-fe')
   })
 
   it('unknown section id → /feed', () => {
-    const url = deriveUrl('section', 'section-unknown', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'section', referenceId: 'section-unknown' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 
   it('content_item with projectId → /feed/:slug/item/:id', () => {
-    const url = deriveUrl('content_item', 'ci-doc-001', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'content_item', referenceId: 'ci-doc-001' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed/csf-live/item/ci-doc-001')
   })
 
   it('content_item without projectId (general feed) → /feed', () => {
-    const url = deriveUrl('content_item', 'ci-idea-006', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'content_item', referenceId: 'ci-idea-006' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 
   it('unknown content_item → /feed', () => {
-    const url = deriveUrl('content_item', 'ci-unknown', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'content_item', referenceId: 'ci-unknown' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 
   it('message referenceType → /feed', () => {
-    const url = deriveUrl('message', 'msg-001', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'message', referenceId: 'msg-001' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 
   it('unknown referenceType → /feed', () => {
-    const url = deriveUrl('unknown_type', 'some-id', PROJECTS, SECTIONS, CONTENT_ITEMS)
+    const url = getNotificationUrl(
+      { referenceType: 'unknown_type', referenceId: 'some-id' },
+      { projects: PROJECTS, sections: SECTIONS, contentItems: CONTENT_ITEMS }
+    )
     expect(url).toBe('/feed')
   })
 })

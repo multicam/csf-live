@@ -3,8 +3,14 @@ import { Plus, Send, Mic, Camera, Paperclip } from 'lucide-react'
 import { usePostMessage } from '@/hooks/useFeed'
 import { useCreateContentItem } from '@/hooks/useContentItem'
 import { showToast } from '@/components/shared/ToastProvider'
-import { CURRENT_USER_ID } from '@csf-live/shared/constants'
 import { cn } from '@/lib/utils'
+import {
+  buildFileContentItem,
+  buildLinkContentItem,
+  buildPhotoContentItem,
+  buildVoiceContentItem,
+  isSupportedUrl,
+} from './composeInput.utils'
 
 interface ComposeInputProps {
   discussionId: string
@@ -12,15 +18,6 @@ interface ComposeInputProps {
 }
 
 type Mode = 'text' | 'enhanced'
-
-function isUrl(text: string): boolean {
-  try {
-    const url = new URL(text.trim())
-    return url.protocol === 'http:' || url.protocol === 'https:'
-  } catch {
-    return false
-  }
-}
 
 export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
   const [mode, setMode] = useState<Mode>('text')
@@ -51,28 +48,8 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
     const trimmed = text.trim()
     if (!trimmed) return
 
-    if (isUrl(trimmed)) {
-      const url = new URL(trimmed)
-      await createContentItem.mutateAsync({
-        type: 'link',
-        title: null,
-        body: null,
-        mediaUrl: trimmed,
-        mediaType: null,
-        metadata: {
-          title: trimmed,
-          description: null,
-          favicon: null,
-          ogImage: null,
-          domain: url.hostname,
-        },
-        source: 'human',
-        sourceDetail: null,
-        projectId: projectId ?? null,
-        sectionId: null,
-        parentId: null,
-        authorId: CURRENT_USER_ID,
-      })
+    if (isSupportedUrl(trimmed)) {
+      await createContentItem.mutateAsync(buildLinkContentItem(trimmed, projectId))
     } else {
       await postMessage.mutateAsync({ discussionId, content: trimmed })
     }
@@ -128,25 +105,14 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
     await new Promise<void>((resolve) => {
       recorder.onstop = () => resolve()
       recorder.stop()
-      recorder.stream.getTracks().forEach(t => t.stop())
+      for (const track of recorder.stream.getTracks()) {
+        track.stop()
+      }
     })
     setIsRecording(false)
     const blob = new Blob(recordingChunksRef.current, { type: 'audio/webm' })
     const blobUrl = URL.createObjectURL(blob)
-    await createContentItem.mutateAsync({
-      type: 'voice',
-      title: 'Voice note',
-      body: null,
-      mediaUrl: blobUrl,
-      mediaType: 'audio/webm',
-      metadata: { duration: durationMs },
-      source: 'human',
-      sourceDetail: null,
-      projectId: projectId ?? null,
-      sectionId: null,
-      parentId: null,
-      authorId: CURRENT_USER_ID,
-    })
+    await createContentItem.mutateAsync(buildVoiceContentItem(blobUrl, durationMs, projectId))
     setMode('text')
   }
 
@@ -159,20 +125,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
     const file = e.target.files?.[0]
     if (!file) return
     const blobUrl = URL.createObjectURL(file)
-    await createContentItem.mutateAsync({
-      type: 'photo',
-      title: file.name || 'Photo',
-      body: null,
-      mediaUrl: blobUrl,
-      mediaType: file.type,
-      metadata: {},
-      source: 'human',
-      sourceDetail: null,
-      projectId: projectId ?? null,
-      sectionId: null,
-      parentId: null,
-      authorId: CURRENT_USER_ID,
-    })
+    await createContentItem.mutateAsync(buildPhotoContentItem(file, blobUrl, projectId))
     // Reset input so the same file can be selected again
     e.target.value = ''
     setMode('text')
@@ -187,20 +140,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
     const file = e.target.files?.[0]
     if (!file) return
     const blobUrl = URL.createObjectURL(file)
-    await createContentItem.mutateAsync({
-      type: 'file',
-      title: file.name,
-      body: null,
-      mediaUrl: blobUrl,
-      mediaType: file.type,
-      metadata: { fileName: file.name, fileSize: file.size, mimeType: file.type },
-      source: 'human',
-      sourceDetail: null,
-      projectId: projectId ?? null,
-      sectionId: null,
-      parentId: null,
-      authorId: CURRENT_USER_ID,
-    })
+    await createContentItem.mutateAsync(buildFileContentItem(file, blobUrl, projectId))
     e.target.value = ''
     setMode('text')
   }
@@ -235,6 +175,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
           ) : (
             <>
               <button
+                type="button"
                 className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors select-none"
                 onPointerDown={handleVoicePointerDown}
                 onPointerUp={handleVoicePointerUp}
@@ -243,6 +184,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
                 Voice
               </button>
               <button
+                type="button"
                 className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors"
                 onClick={handleCameraClick}
               >
@@ -250,6 +192,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
                 Photo
               </button>
               <button
+                type="button"
                 className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-warm-500 hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors"
                 onClick={handleFileClick}
               >
@@ -263,6 +206,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
 
       <div className="flex items-end gap-2">
         <button
+          type="button"
           onClick={() => setMode(m => (m === 'text' ? 'enhanced' : 'text'))}
           className={cn(
             'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors',
@@ -293,6 +237,7 @@ export function ComposeInput({ discussionId, projectId }: ComposeInputProps) {
         />
 
         <button
+          type="button"
           onClick={handleSubmit}
           disabled={!text.trim() || isLoading}
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-warm-900 text-white hover:bg-warm-700 disabled:opacity-40 dark:bg-warm-100 dark:text-warm-900 dark:hover:bg-warm-200 transition-colors"
