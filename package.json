@@ -11,5 +11,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.8"
+  },
+  "dependencies": {
+    "flatted": "^3.4.2"
+  },
+  "overrides": {
+    "picomatch": ">=4.0.4",
+    "flatted": ">=3.4.2",
+    "vite": ">=8.0.16 <9",
+    "undici": ">=7.28.0 <8",
+    "linkify-it": ">=5.0.1 <6"
   }
 }

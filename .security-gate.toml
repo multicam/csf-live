@@ -1,0 +1,125 @@
+# Supply-chain allowlist — staleness and typo-distance false positives
+# Generated 2026-05-26 as part of Phase 5 bootstrap remediation
+
+# --- Staleness (recently published, no CVE) ---
+
+[[allowlist]]
+package = "@oxc-project/types"
+ecosystem = "npm"
+reason = "Staleness-only: 7.4d old at scan; no CVE"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "@rolldown/*"
+ecosystem = "npm"
+reason = "Staleness-only: rolldown platform bindings + pluginutils 1.0.x, 5–13d old at scan; no CVE"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "rolldown"
+ecosystem = "npm"
+reason = "Staleness-only: 1.0.2, 5.5d old at scan; no CVE"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "postcss"
+ecosystem = "npm"
+reason = "Staleness-only: 8.5.15, 6.4d old at scan; no CVE"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "vite"
+ecosystem = "npm"
+reason = "Staleness-only: 8.0.14, 4.6d old at scan; no CVE"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+# --- Typo-distance false positives ---
+
+[[allowlist]]
+package = "@types/hast"
+ecosystem = "npm"
+reason = "Legitimate DefinitelyTyped package; typo-distance flag vs @types/jest is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "acorn"
+ecosystem = "npm"
+reason = "Standard JS parser; typo-distance flag vs cors is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "bail"
+ecosystem = "npm"
+reason = "unified ecosystem utility; typo-distance flag vs babel is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "jiti"
+ecosystem = "npm"
+reason = "TypeScript/ESM runtime; typo-distance flag vs vite is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "jsesc"
+ecosystem = "npm"
+reason = "JS string escaping; typo-distance flag vs jest is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "mrmime"
+ecosystem = "npm"
+reason = "MIME type resolver; typo-distance flag vs mime is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "obug"
+ecosystem = "npm"
+reason = "object debug utility; typo-distance flag vs debug is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "parse5"
+ecosystem = "npm"
+reason = "HTML parser; typo-distance flag vs parcel is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "recast"
+ecosystem = "npm"
+reason = "JS AST rewriting; typo-distance flag vs react is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "saxes"
+ecosystem = "npm"
+reason = "SAX XML parser; typo-distance flag vs sass is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "sirv"
+ecosystem = "npm"
+reason = "static file server; typo-distance flag vs swr is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
+
+[[allowlist]]
+package = "vfile"
+ecosystem = "npm"
+reason = "unified virtual file; typo-distance flag vs vite is false positive"
+reviewed = "2026-05-25"
+review_expires = "2026-08-26"
