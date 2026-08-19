@@ -6,6 +6,7 @@
       "name": "csf-live",
       "dependencies": {
         "flatted": "^3.4.2",
+        "linkify-it": "^5.0.1",
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.8",
