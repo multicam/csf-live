@@ -71,6 +71,7 @@
     },
   },
   "overrides": {
+    "@tiptap/core": ">=3.30.5 <4",
     "flatted": ">=3.4.2",
     "linkify-it": ">=5.0.1 <6",
     "picomatch": ">=4.0.4",
