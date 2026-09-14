@@ -83,13 +83,6 @@ reviewed = "2026-05-25"
 review_expires = "2026-08-26"
 
 [[allowlist]]
-package = "obug"
-ecosystem = "npm"
-reason = "object debug utility; typo-distance flag vs debug is false positive"
-reviewed = "2026-05-25"
-review_expires = "2026-08-26"
-
-[[allowlist]]
 package = "parse5"
 ecosystem = "npm"
 reason = "HTML parser; typo-distance flag vs parcel is false positive"
