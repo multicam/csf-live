@@ -1,0 +1,11 @@
+# Hoisted linker: node_modules/<pkg> layout instead of bun's isolated node_modules/.bun/.
+#
+# Why: bun 1.4.3's isolated linker never initialises its umask static
+# (src/install/bin.rs), so every package bin target is chmod'd 0o777. Bins are
+# hardlinked from ~/.bun/install/cache, so that 777 propagates to the shared
+# cache inode and into every other project's copy. The hoisted linker calls
+# ensure_umask() and yields 775 under umask 002.
+#
+# Remove once bun fixes the isolated linker's umask handling.
+[install]
+linker = "hoisted"
