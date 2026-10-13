@@ -18,8 +18,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@csf-live/shared": ["../shared/types.ts"],
-      "@csf-live/shared/constants": ["../shared/constants.ts"],
-      "@tldraw/tlschema": ["./node_modules/@tldraw/tlschema/dist-cjs/index.d.ts"]
+      "@csf-live/shared/constants": ["../shared/constants.ts"]
     }
   },
   "include": ["src"]
